@@ -1,0 +1,12 @@
+A conectar-se ao servidor
+A extrair componentes do banco de dados
+A criar banco de dados 'core_schema'
+'core_schema': a criar tabela core_schema.dbo.AutoLog
+'core_schema': a criar tabela core_schema.dbo.AutoAction
+'core_schema': a criar tabela core_schema.dbo.Components
+A criar banco de dados 'core'
+'core': a criar tabela core.dbo.Produto
+'core': a criar tabela core_schema.dbo.AutoLog
+'core': a criar tabela core_schema.dbo.AutoAction
+'core': a criar tabela core_schema.dbo.Components
+Concluído

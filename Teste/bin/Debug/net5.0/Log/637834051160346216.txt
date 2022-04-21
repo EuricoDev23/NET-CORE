@@ -1,0 +1,4 @@
+A conectar-se ao servidor
+A extrair componentes do banco de dados
+A criar banco de dados 'Droom_mvc'
+A connection was successfully established with the server, but then an error occurred during the login process. (provider: SSL Provider, error: 0 - A cadeia de certificado foi emitida por uma autoridade não fidedigna.)

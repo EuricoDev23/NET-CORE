@@ -1,0 +1,9 @@
+A conectar-se ao servidor
+A extrair componentes do banco de dados
+A criar banco de dados 'TESTE'
+'TESTE': a criar tabela TESTE.dbo.Categoria
+'TESTE': a criar tabela TESTE.dbo.AutoLog
+'TESTE': a criar tabela TESTE.dbo.AutoAction
+'TESTE': a criar tabela TESTE.dbo.Components
+'TESTE': a criar tabela TESTE.dbo.Produto
+Concluído

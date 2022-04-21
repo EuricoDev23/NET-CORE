@@ -1,0 +1,4 @@
+A conectar-se ao servidor
+A extrair componentes do banco de dados
+Concluído
+Object reference not set to an instance of an object.

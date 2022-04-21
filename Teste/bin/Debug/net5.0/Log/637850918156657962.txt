@@ -1,0 +1,4 @@
+A conectar-se ao servidor
+A extrair componentes do banco de dados
+A criar banco de dados 'poco_schema'
+A criar banco de dados 'core_teste'

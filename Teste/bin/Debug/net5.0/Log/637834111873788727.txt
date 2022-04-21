@@ -1,0 +1,9 @@
+A conectar-se ao servidor
+A extrair componentes do banco de dados
+A criar banco de dados 'poco_schema'
+'poco_schema': a criar tabela poco_schema.dbo.AutoLog
+'poco_schema': a criar tabela poco_schema.dbo.AutoAction
+'poco_schema': a criar tabela poco_schema.dbo.Components
+A criar banco de dados 'core'
+'core': a criar tabela core.dbo.Produto
+Concluído

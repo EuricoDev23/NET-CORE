@@ -1,0 +1,9 @@
+A conectar-se ao servidor
+A extrair componentes do banco de dados
+A criar banco de dados 'Droom_mvc'
+'Droom_mvc': a criar tabela Droom_mvc.dbo.AutoLog
+'Droom_mvc': a criar tabela Droom_mvc.dbo.AutoAction
+'Droom_mvc': a criar tabela Droom_mvc.dbo.Components
+A criar banco de dados 'core'
+'core': a criar tabela core.dbo.Produto
+Concluído
