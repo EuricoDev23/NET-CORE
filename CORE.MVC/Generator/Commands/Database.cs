@@ -1,23 +1,17 @@
 ﻿//using Microsoft.SqlServer.Management.Common;
 //using Microsoft.SqlServer.Management.Smo;
-using CORE.MVC.Models;
+using LinqToDB.Data;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Threading;
-using LinqToDB.Data;
+using System.Linq;
 
 namespace CORE.MVC.Generator.Commands
 {
-   internal class Database
+    internal class Database
     {
-        public class Helper {
+        public class Helper
+        {
 
             public const string UseMaster = "USE master;";
             public const string Create = "CREATE DATABASE {0};\nGO\nUSE {0};\nGO\n";
@@ -28,9 +22,9 @@ namespace CORE.MVC.Generator.Commands
         static List<KeyValuePair<Type, DatabaseModel.Table>> tables = new List<KeyValuePair<Type, DatabaseModel.Table>>();
         //static List<KeyValuePair<Type, DatabaseModel.Table>> tablesFK = new List<KeyValuePair<Type, DatabaseModel.Table>>();
         private static List<KeyValuePair<Type, DatabaseModel.Table>> TableOrderCreate(IEnumerable<KeyValuePair<Type, DatabaseModel.Table>> tabs)
-        {            
-            var temp = new List<KeyValuePair<Type, DatabaseModel.Table>>(tabs.OrderBy(a=>a.Value.Fks.Count==0));
-               
+        {
+            var temp = new List<KeyValuePair<Type, DatabaseModel.Table>>(tabs.OrderBy(a => a.Value.Fks.Count == 0));
+
             var tables = new List<KeyValuePair<Type, DatabaseModel.Table>>();
             //var tablesFK = new List<KeyValuePair<Type, DatabaseModel.Table>>();
             int i = 0;
@@ -43,21 +37,25 @@ namespace CORE.MVC.Generator.Commands
                     {
                         tables.Add(tb);
                         temp.Remove(tb);
-                    }else{
+                    }
+                    else
+                    {
                         bool success = true;
                         foreach (var item in tb.Value.Fks)
-                        {                        
-                            if (item.Value.Fields.IsChield == false && item.Value.TypeModel.FullName!=tb.Key.FullName && tables.Any(a=>a.Key.FullName == item.Value.TypeModel.FullName)==false)
+                        {
+                            if (item.Value.Fields.IsChield == false && item.Value.TypeModel.FullName != tb.Key.FullName && tables.Any(a => a.Key.FullName == item.Value.TypeModel.FullName) == false)
                             {
                                 success = false;
                                 break;
                             }
                         }
-                        if(success){
+                        if (success)
+                        {
                             tables.Add(tb);
                             temp.Remove(tb);
                         }
-                        else{
+                        else
+                        {
                             i++;
                         }
                     }
@@ -84,10 +82,11 @@ namespace CORE.MVC.Generator.Commands
                     var tb = temp[i];
                     {
                         bool success = true;
-                        
-                        foreach (var item in tabs.Where(a=>a.Key.FullName!=tb.Key.FullName).ToList())
+
+                        foreach (var item in tabs.Where(a => a.Key.FullName != tb.Key.FullName).ToList())
                         {
-                            if(tb.Value.File.Sql.Contains(item.Value.Name) && tables.Any(k=>k.Key.FullName==item.Key.FullName)==false){
+                            if (tb.Value.File.Sql.Contains(item.Value.Name) && tables.Any(k => k.Key.FullName == item.Key.FullName) == false)
+                            {
                                 success = false;
                                 break;
                             }
@@ -96,7 +95,7 @@ namespace CORE.MVC.Generator.Commands
                         {
                             tables.Add(tb);
                             temp.Remove(tb);
-                        }                        
+                        }
                         i++;
                     }
                 }
@@ -113,15 +112,17 @@ namespace CORE.MVC.Generator.Commands
         {
             try
             {
-               return (new DictionaryComparer<Type, DatabaseModel.Table>().Equals(appModel.Tables, databaseModel.Tables))==false;
+                return (new DictionaryComparer<Type, DatabaseModel.Table>().Equals(appModel.Tables, databaseModel.Tables)) == false;
                 //return appModel.Tables.(databaseModel.Tables);
             }
-            catch (Exception ex){
+            catch (Exception ex)
+            {
                 return false;
             }
         }
-        private static string ReplaceGo(string cmd){
-            return cmd.Replace("GO", "").Replace("go","");
+        private static string ReplaceGo(string cmd)
+        {
+            return cmd.Replace("GO", "").Replace("go", "");
         }
         public static bool Create(DataMapper entity)
         {
@@ -158,7 +159,7 @@ namespace CORE.MVC.Generator.Commands
                     {
                         //Use master
                         CORE.MVC.Log.Write("A criar banco de dados '" + item.Key + "'");
-                       entity.Data.Connection.ChangeDatabase(DatabaseConsts.Master);
+                        entity.Data.Connection.ChangeDatabase(DatabaseConsts.Master);
 
                         entity.Data.Execute(ReplaceGo(Helper.UseMaster));
                         //generate database
@@ -174,9 +175,8 @@ namespace CORE.MVC.Generator.Commands
                         //GENERATED TABLES
                         foreach (var tb in TableOrderCreate(db.Tables.Where(i => i.Value.Name.Contains(item.Key))))
                         {
-                            Generator.Commands.Table.Create(entity,tb);
-                            CORE.MVC.Log.Write("'" + item.Key + "': a criar tabela "+tb.Value.Name);
-
+                            Generator.Commands.Table.Create(entity, tb);
+                            CORE.MVC.Log.Write("'" + item.Key + "': a criar tabela " + tb.Value.Name);
                         }
 
                         //GENERATED VIEWS
@@ -201,11 +201,12 @@ namespace CORE.MVC.Generator.Commands
                         entity.Data.Execute(ReplaceGo(Helper.UseMaster));
 
                         Debug.WriteLine("base de dados criada com êxito");
-                        //entity.Save(AutoAction.Instance(item.Key, AutoAction.Type.CreateDatabase)).Validate();
-
+                        //Inicializar bd
+                        using (var db2 = db.Tables.FirstOrDefault(a => a.Value.Database == item.Key).Key.GetDataMapper())
+                        { db2.Record(); }
                     }
                 }
-                
+
                 return true;
             }
             catch (Exception ex)
@@ -219,7 +220,7 @@ namespace CORE.MVC.Generator.Commands
         {
             entity.Data.Execute(ReplaceGo(Helper.UseMaster));
             try
-            {   
+            {
                 foreach (var item in DatabaseModel.Instance.Databases.Keys.ToList())
                 {
                     try
@@ -235,7 +236,7 @@ namespace CORE.MVC.Generator.Commands
                     }
                 }
             }
-            catch 
+            catch
             {
 
             }
@@ -250,7 +251,7 @@ namespace CORE.MVC.Generator.Commands
                 {
                     try
                     {
-                       // if (entity.Find.Exists<AutoAction>(i => i.DbName == item && i.Tipo == AutoAction.Type.WriteData) == false)
+                        // if (entity.Find.Exists<AutoAction>(i => i.DbName == item && i.Tipo == AutoAction.Type.WriteData) == false)
                         {
                             entity.Data.Execute(ReplaceGo(string.Format(Helper.Drop, item)));
                         }

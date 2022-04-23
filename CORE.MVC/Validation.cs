@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CORE.MVC
 {
-   public class Validation
+    public class Validation
     {
         object model = null;
 
@@ -24,7 +22,7 @@ namespace CORE.MVC
                 var shema = DatabaseModel.Instance.Tables[model.GetType()];
                 var list = model.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(i => i.GetCustomAttribute<ExistAttribute>() != null).ToList();
                 DataTable dt = new DataTable();
-                
+
                 foreach (var item in list)
                 {
                     object val = model.GetValueProperty(item.Name);
@@ -34,16 +32,16 @@ namespace CORE.MVC
                     {
                         if (item.PropertyType == typeof(string))
                         {
-                           // dt = entity.db_.Find.DataTable(model.GetType(), new string[] { $"{shema.PrimaryKey.Property.Name}" }, $"WHERE {shema.PrimaryKey.Property.Name} <> @id AND LOWER({item.GetColumn()}) = LOWER(@chave) and Status=1", new { chave = val, id = id });
+                            // dt = entity.db_.Find.DataTable(model.GetType(), new string[] { $"{shema.PrimaryKey.Property.Name}" }, $"WHERE {shema.PrimaryKey.Property.Name} <> @id AND LOWER({item.GetColumn()}) = LOWER(@chave) and Status=1", new { chave = val, id = id });
                         }
                         else
                         {
-                           // dt = entity.db_.Find.DataTable(model.GetType(), new string[] { $"{shema.PrimaryKey.Property.Name}" }, $"WHERE {shema.PrimaryKey.Property.Name} <> @id AND {item.GetColumn()} = @chave and Status = 1", new { chave = val, id = id });
+                            // dt = entity.db_.Find.DataTable(model.GetType(), new string[] { $"{shema.PrimaryKey.Property.Name}" }, $"WHERE {shema.PrimaryKey.Property.Name} <> @id AND {item.GetColumn()} = @chave and Status = 1", new { chave = val, id = id });
                         }
                         if (dt != null && dt.Rows.Count > 0)
                         {
                             var prop = shema.Columns.FirstOrDefault(i => i.Property.Name == item.Name);
-                            AddError($"{prop.Display} {val ? .ToString()} já existe");
+                            AddError($"{prop.Display} {val?.ToString()} já existe");
                         }
                     }
                 }
@@ -58,12 +56,16 @@ namespace CORE.MVC
         /// <summary>
         /// Verifica se o modelo está valido
         /// </summary>
-        public bool IsValid { get {
+        public bool IsValid
+        {
+            get
+            {
                 LoadValidations();
                 model.CallMedthod("SetValidations");
                 if (Errors_.Count == 0) { CallExiste(); }
                 var valid = Errors_.Count == 0; return valid;
-            } }
+            }
+        }
 
         /// <summary>
         /// Lista de erros
@@ -90,20 +92,23 @@ namespace CORE.MVC
         /// <param name="error">Descrição de erro</param>
         public void AddError(string field, string error)
         {
-            ErrorFields_.Add(new Field { Name=field, Error = error });
+            ErrorFields_.Add(new Field { Name = field, Error = error });
             AddError(error);
         }
 
-        public Validation(Entity model){
+        public Validation(Entity model)
+        {
             this.model = model;
         }
 
-        private void LoadValidations(){
+        private void LoadValidations()
+        {
             ErrorFields_.Clear();
             Errors_.Clear();
         }
 
-        public class Field{
+        public class Field
+        {
             public string Name { get; set; }
             public string Error { get; set; }
         }
@@ -119,8 +124,8 @@ namespace CORE.MVC
                 //DatabaseModel.Instance.Tables[type].g
                 var field = new Field
                 {
-                    Name=unique,
-                    Error=$"O valor do campo '{unique}' já existe"
+                    Name = unique,
+                    Error = $"O valor do campo '{unique}' já existe"
                 };
                 return field;
             }

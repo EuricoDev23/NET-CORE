@@ -9,19 +9,22 @@ using System.Xml.Serialization;
 
 namespace CORE.MVC
 {
-   public class Generation
+    public class Generation
     {
         private readonly static object syncRoot = new Object();
 
         public readonly static long Chave = Math.Abs(BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0));
 
         //static Random Random_;
-        static long last=0;
+        static long last = 0;
         //static Random Random { get{
         //        Random_ = Random_ ?? new Random();
         //        return Random_;
         //} }
-        public static long ID { get {
+        public static long ID
+        {
+            get
+            {
                 //int max= Math.Abs(((int)DateTime.Now.Ticks) / (365*2));
                 //last = Random.Next(0,max+1);
                 lock (syncRoot)
@@ -29,7 +32,8 @@ namespace CORE.MVC
                     last++;
                     return Chave + last;
                 }
-            } }
+            }
+        }
 
         private static List<long> IDsTest()
         {
@@ -41,10 +45,11 @@ namespace CORE.MVC
             }
             return list;
         }
-        private static Dictionary<long,int> GetDuplicates(List<long> list)
+        private static Dictionary<long, int> GetDuplicates(List<long> list)
         {
             Dictionary<long, int> d = new Dictionary<long, int>();
-            list.GroupBy(i =>i).ToList().ForEach(i => {
+            list.GroupBy(i => i).ToList().ForEach(i =>
+            {
                 var c = list.Where(a => a == i.Key).Count();
                 d.Add(i.Key, c);
             });
@@ -58,10 +63,11 @@ namespace CORE.MVC
             int count = 0;
             for (int i = 0; i < tasks.Length; i++)
             {
-                tasks[i] = Task.Run(() => {
+                tasks[i] = Task.Run(() =>
+                {
                     count++;
                     int pos = count;
-                    foreach (var item in GetDuplicates(Generation.IDsTest()).OrderBy(k =>k.Value))
+                    foreach (var item in GetDuplicates(Generation.IDsTest()).OrderBy(k => k.Value))
                     {
                         wr.AppendLine($"Task[{(pos)}] =>[{item.Key}] = {item.Value}");
 
@@ -73,10 +79,10 @@ namespace CORE.MVC
 
             wr.AppendLine($"\nTarefas concluidas: ");
             Console.WriteLine(wr.ToString());
-            File.WriteAllText($"Keys_{DateTime.Now.ToString("yyyMMddmmss")}.txt",wr.ToString());
+            File.WriteAllText($"Keys_{DateTime.Now.ToString("yyyMMddmmss")}.txt", wr.ToString());
         }
 
-        public static string XML(object model,string path="")
+        public static string XML(object model, string path = "")
         {
             XmlDocument xmlDoc = new XmlDocument();
             XmlSerializer xmlSerializer = new XmlSerializer(model.GetType());
@@ -86,11 +92,11 @@ namespace CORE.MVC
             {
                 XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
                 ns.Add("", "");
-                xmlSerializer.Serialize(xmlStream, model,ns);
+                xmlSerializer.Serialize(xmlStream, model, ns);
                 xmlStream.Position = 0;
                 xmlDoc.Load(xmlStream);
-                XML = xmlDoc.InnerXml;                
-                
+                XML = xmlDoc.InnerXml;
+
                 //mudar encoding para suprotar caracteres portugueses como acentos
                 /*
                 XMLBensDados = XMLBensDados.Replace("xml version=\"1.0\"",
@@ -105,7 +111,7 @@ namespace CORE.MVC
                 }
                 return XML;
             }
-            
+
         }
 
         static public Object XMLToObject(string XMLString, Object oObject)

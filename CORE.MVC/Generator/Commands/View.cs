@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CORE.MVC.Generator.Commands
 {
-   internal class View
+    internal class View
     {
         public class Helper
         {
@@ -14,7 +12,7 @@ namespace CORE.MVC.Generator.Commands
         }
         public static string Create(KeyValuePair<Type, DatabaseModel.View> view)
         {
-            StringBuilder sb = new StringBuilder(string.Format(Helper.Create, view.Value.Name,view.Value.File.Sql));
+            StringBuilder sb = new StringBuilder(string.Format(Helper.Create, view.Value.Name, view.Value.File.Sql));
 
             return sb.ToString();
         }
@@ -24,7 +22,7 @@ namespace CORE.MVC.Generator.Commands
             StringBuilder sb = new StringBuilder();
             foreach (var item in view)
             {
-                sb.AppendLine(Create(item)+"\n");
+                sb.AppendLine(Create(item) + "\n");
             }
 
             return sb.ToString();

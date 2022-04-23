@@ -1,11 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 
 namespace CORE.MVC
 {
@@ -73,7 +66,7 @@ namespace CORE.MVC
 
         //        var mbPK = GetMemberClass(find.Principal);                
         //        tbFK1 = mbPK.Table.GetTableFK(cont[1]);
-                
+
         //        var PK_ColFK = mbPK.Table.GetColumnFK(cont[1]);
         //        if(mbPK.Joins.ToString().Contains(tbFK1.Name)){
         //            return;
@@ -109,13 +102,13 @@ namespace CORE.MVC
         //            mbPK.Joins.Append($"{alias}.{tbFK2.PrimaryKey.Name} = ");
         //            mbPK.Joins.Append($"{tbFK1.Name}.{PK_ColFK2.Name}");
         //        }
-                
+
         //    }
         //    catch (Exception ex1)
         //    {
 
         //    }
-           
+
         //}
 
         //private MemberClass GetMemberClass(Type type, bool default_ = false)
@@ -366,7 +359,7 @@ namespace CORE.MVC
         //    _Expression = b;
         //    _ExpressionLeft = b.Left;
         //    _ExpressionRight = b.Right;
-            
+
         //    this.Visit(b.Left);
 
         //    _Expression = b;
@@ -636,7 +629,7 @@ namespace CORE.MVC
         //    if (m.Expression != null && m.Expression.NodeType == ExpressionType.Parameter)
         //    {
         //        var item = AddParameter(m.Expression.Type, m.Member.Name, null, false, m.Type);
-                
+
         //        if (exp_ != null && exp_.Contains("Like") && likeFlag==false && m.Type.FullName.Contains("DateTime"))
         //        {
         //            sb.Append("Convert(varchar,");
@@ -686,7 +679,7 @@ namespace CORE.MVC
         //        if(m.Member.Name.Contains("HasValue"))
         //        {
         //            var ex = (m.Expression as MemberExpression).Member;
-                    
+
         //            var item = AddParameter(ex.ReflectedType, ex.Name, null, false, m.Expression.Type.GenericTypeArguments[0]);
 
         //            sb.Append(item.Member.Alias);
@@ -823,7 +816,7 @@ namespace CORE.MVC
         //    //LambdaExpression lambdaExpression = (LambdaExpression)unary.Operand;
 
         //    //lambdaExpression = (LambdaExpression)Evaluator.PartialEval(lambdaExpression);
-            
+
         //    Expression body = (expression.Object as MemberExpression ?? expression.Arguments[0]);
         //    if (body != null)
         //    {

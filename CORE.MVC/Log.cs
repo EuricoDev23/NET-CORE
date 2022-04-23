@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LinqToDB.Mapping;
+using System;
 using System.IO;
-using LinqToDB.Mapping;
+using System.Linq;
 
 namespace CORE.MVC
 {
     [Source(null, null, "LOG")]
-    public class LogModel:Entity
+    public class LogModel : Entity
     {
         [Pk(PK.Database)]
         public long IDLog { get; set; }
@@ -21,8 +18,9 @@ namespace CORE.MVC
     public static class Log
     {
         private static string path = "Log";
-        private static string fileName = path+"/"+DateTime.Now.Ticks.ToString()+".txt";
-        public static void WriteLog(this Entity model, string descricao) {
+        private static string fileName = path + "/" + DateTime.Now.Ticks.ToString() + ".txt";
+        public static void WriteLog(this Entity model, string descricao)
+        {
         }
         public static void WriteLog(this Entity model, string descricao, string values)
         {
@@ -30,13 +28,15 @@ namespace CORE.MVC
         public static void Write(LogModel model)
         {
         }
-        public static void Write(string message){
+        public static void Write(string message)
+        {
             try
             {
-                if(Directory.Exists(path)==false){
+                if (Directory.Exists(path) == false)
+                {
                     Directory.CreateDirectory(path);
                 }
-                File.AppendAllLines(fileName, new string[]{ message });
+                File.AppendAllLines(fileName, new string[] { message });
             }
             catch (Exception ex)
             {
@@ -48,7 +48,7 @@ namespace CORE.MVC
         {
             try
             {
-            return File.ReadAllLines(Directory.EnumerateFiles(path).LastOrDefault());
+                return File.ReadAllLines(Directory.EnumerateFiles(path).LastOrDefault());
             }
             catch (Exception ex)
             {

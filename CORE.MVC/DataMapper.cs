@@ -1,39 +1,36 @@
-﻿
-using CORE.MVC;
-using CORE.MVC.Models;
+﻿using CORE.MVC.Models;
 using LinqToDB;
 using LinqToDB.Data;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CORE.MVC
 {
     /// <summary>
     /// Manipulador de eventos da base de dados
     /// </summary>
-    public class DataMapper
+    public class DataMapper: IDisposable
     {
         DataConnection Data_ = null;
         JsonConnetion Config = null;
-        string ConnectionName = null;
 
-        public ITable<T> Table<T>() where T:class
+        public ITable<T> Table<T>() where T : class
         {
-            //var tb=DatabaseModel.Instance.Tables.GetTable(type);
             return Data.GetTable<T>();
         }
         public static ITable<T> Search<T>() where T : class
         {
-            //var tb=DatabaseModel.Instance.Tables.GetTable(type);
-            return new DataMapper().Table<T>();
+            if (DatabaseModel.State != StateMode.Ready)
+            {
+                var tb = DatabaseModel.Instance;
+                DatabaseModel.SetStatus(StateMode.None);
+            }           
+            return typeof(T).GetDataMapper().Table<T>();
         }
         public bool ExistsDatabase(string name)
         {
@@ -49,7 +46,8 @@ namespace CORE.MVC
         }
 
         #region Declarações
-        public enum StateMode {
+        public enum StateMode
+        {
             None = 0,
             Running = 2,
             Ready = 3,
@@ -59,15 +57,31 @@ namespace CORE.MVC
         #endregion
 
         #region Propriedades
-        public Connection Connection { get {
+        public Connection Connection
+        {
+            get
+            {
 
                 if (db == null)
                 {
                     db = new Connection(Data_);
                 }
                 return db;
-            } }
-        public DataConnection Data => Data_;
+            }
+        }
+        public DataConnection Data
+        {
+            get
+            {
+                if (Data_ == null)
+                {
+                    var v = this.GetType();
+                    this.Config = DatabaseModel.Instance.Mapper.FirstOrDefault(i => i.Key.FullName == v.FullName).Value;
+                    Data_ = new DataConnection(Config.Provider, Config.ConnectionString);
+                }
+                return Data_;
+            }
+        }
         /// <summary>
         /// Estado do Mapeador de objecto
         /// </summary>
@@ -84,7 +98,7 @@ namespace CORE.MVC
             var rs = new Result();
             try
             {
-               var dt= Activator.CreateInstance<DataMapper>();
+                var dt = Activator.CreateInstance<DataMapper>();
                 //dt.Init();
             }
             catch (Exception ex)
@@ -101,9 +115,8 @@ namespace CORE.MVC
         {
             Init();
         }
-        
+
         #region Init
-        internal DataMapper dataMapperInternal;
 
         /// <summary>
         /// Inicializar o framework e Carregar eventos iniciais
@@ -112,13 +125,7 @@ namespace CORE.MVC
         /// <param name="DataBaseName">Nome padrão</param>
         protected virtual void Initialize(string ConnectionName = "TESTE")
         {
-            this.ConnectionName = ConnectionName;
-            if (DatabaseConsts.JsonConfig == null)
-            {
-                DatabaseConsts.JsonConfig = Reflection.Database.GetStringByDatabases();
-            }
-            Config = DatabaseConsts.JsonConfig.Connetions[ConnectionName];
-            DatabaseConsts.DefaultBD = string.IsNullOrWhiteSpace(Config.DatabaseName) ? AppDomain.CurrentDomain.FriendlyName.Replace(" ", "_").Split('.')[0] : Config.DatabaseName;
+
         }
         /// <summary>
         /// Inserir dados padrão
@@ -126,10 +133,10 @@ namespace CORE.MVC
         /// <param name="entity"></param>
         protected void InsertModel(Entity entity)
         {
-            string db = DatabaseModel.Instance.Tables.GetTable(entity.GetType()).Name.Split('.')[0];
-            if (/*db == DatabaseConsts.ActiveBD &&*/  State == StateMode.Running)
+            var tb = DatabaseModel.Instance.Tables.GetTable(entity.GetType());//.Name.Split('.')[0];
+            if (tb.Database == Config.DatabaseName)
             {
-                dataMapperInternal.Save(entity).Validate();
+                this.Save(entity).Validate();
             }
         }
         /// <summary>
@@ -140,74 +147,34 @@ namespace CORE.MVC
         {
             foreach (Entity item in models)
             {
-                if(item !=null){
+                if (item != null)
+                {
                     InsertModel(item);
                 }
             }
         }
-        
-        private void Init()
+        internal void Record()
         {
             Initialize();
+        }
+        private void Init()
+        {
             try
             {
-                Data_ = new DataConnection(Config.Provider, Config.ConnectionString);
-
-                //db.dataMapper = this;
                 if (DatabaseModel.State < StateMode.Running)
                 {
-                    Debug.WriteLine("A carregar banco de dados...");
-                    Debug.WriteLine("DROOM.MVC");
-                    Debug.WriteLine("A mapear objectos...");
-                    
-                   var instance = DatabaseModel.Instance;
-
-                    //db.GetConnection.ConnectionString = DatabaseConsts.ConnectionString;
-
-                    Debug.WriteLine("");
-                    Debug.WriteLine("Objectos encontrados:");
-                    Debug.WriteLine("Tabelas: " + string.Join("\n", instance.Tables.Select(a => a.Value.Name).ToArray()));
-                    Debug.WriteLine("View: " + string.Join("\n", instance.Views.Select(a => a.Value.Name).ToArray()));
-                    Debug.WriteLine("Procedures: ");
-                    
-                    if (DatabaseModel.State==StateMode.Running)
-                    {                        
-                        if (Generator.Commands.Database.CreateDatabaseInServer(this))
-                        {
-                            //foreach (var db_name in instance.Databases)
-                            //{
-                            //    //DatabaseConsts.ActiveBD = db_name.Key;
-
-                            //    //if (IsExecute(DatabaseConsts.ActiveBD, AutoAction.Type.CreateDatabase) && IsExecute(DatabaseConsts.ActiveBD, AutoAction.Type.WriteData) == false)
-                            //    {
-                            //        this.Connection.StartTransaction();
-
-                            //        Save(new Components { DatabaseModel = System.Text.Json.JsonSerializer.Serialize(DatabaseModel.Instance) }).Validate();
-
-                            //        foreach (var item in Reflection.Database.GetInitializes())
-                            //        {
-                            //            item.dataMapperInternal = this;
-                            //            item.Initialize();
-                            //        }
-                            //        CORE.MVC.Log.Write("'" + db_name.Key + "' a gravar dados");
-
-                            //        //Save(AutoAction.Instance(DatabaseConsts.ActiveBD, AutoAction.Type.WriteData)).Validate();
-                            //        this.Connection.Commit();
-                            //    }
-                            //}
-                        }                        
-                        DatabaseModel.SetStatus(StateMode.Ready);
-                        Debug.WriteLine("Concluído");
-                        CORE.MVC.Log.Write("Concluído");
+                    var instance = DatabaseModel.Instance;
+                    if (Generator.Commands.Database.CreateDatabaseInServer(this))
+                    {
                     }
-                    Data.Connection.ChangeDatabase(DatabaseConsts.Master);
+                    DatabaseModel.SetStatus(DataMapper.StateMode.Ready);
+                    //Data.Connection.ChangeDatabase(DatabaseConsts.Master);
                 }
-                else
-                {
-                    ////Data.Connection.ChangeDatabase(DatabaseConsts.Master);
-                }
+                //else
+                //{
+                //    ////Data.Connection.ChangeDatabase(DatabaseConsts.Master);
+                //}
                 Data.Connection.ChangeDatabase(Config.DatabaseName);
-
             }
             catch (Exception ex)
             {
@@ -221,11 +188,6 @@ namespace CORE.MVC
                 throw ex;
             }
         }
-        internal bool IsExecute(string Database,AutoAction.Type Tipo)
-        {
-            //return Find.Exists<AutoAction>(i =>i.DbName==Database && i.Tipo == Tipo && i.DataExec.HasValue);
-            return true;
-        }
         #endregion
 
         #region Cud
@@ -237,8 +199,8 @@ namespace CORE.MVC
         /// <param name="model">Entity a ser salvo</param>
         /// <param name="cascade">Entity relacionadas</param>
         /// <returns>Devolve um objeto do tipo 'Result'</returns>
-        public Result Save<T>(T model, bool cascade = true) where T:notnull
-        {   
+        public Result Save<T>(T model, bool cascade = true) where T : notnull
+        {
             var rs = new Result();
             //Entity model = entity.Clone();
             var entity = ((Entity)(object)model);
@@ -249,8 +211,9 @@ namespace CORE.MVC
             {
                 var type = model.GetType();
 
-                if (cascade && Connection.GlobalTransaction==false && Connection.UseTransaction==false){
-                    Connection.StartInternalTransaction();                    
+                if (cascade && Connection.GlobalTransaction == false && Connection.UseTransaction == false)
+                {
+                    Connection.StartInternalTransaction();
                 }
 
                 var Table = DatabaseModel.Instance.Tables.GetTable(type);
@@ -265,13 +228,16 @@ namespace CORE.MVC
                     }
                     SaveAux((dynamic)model, cascade, Table);
                     //model.PreserveState();
-                }else{
+                }
+                else
+                {
 
                     throw new Exception("Não foram encontradas mudanças para salvar.");
                 }
                 //UpdateTransationID();
 
-                if (comit && Connection.GlobalTransaction == false && Connection.UseTransaction){
+                if (comit && Connection.GlobalTransaction == false && Connection.UseTransaction)
+                {
 
                     Connection.Commit();
                 }
@@ -279,7 +245,7 @@ namespace CORE.MVC
             catch (Exception ex)
             {
                 ex = ex.InnerException == null ? ex : ex.InnerException;
-                if (Validation.IsUniqueError(ex)==false && ex.Message != "throw-validations")
+                if (Validation.IsUniqueError(ex) == false && ex.Message != "throw-validations")
                 {
                     rs.AddError(ex);
                 }
@@ -342,7 +308,9 @@ namespace CORE.MVC
                         {
                             rs.AddError(model.Validation.Errors);
                         }
-                    }else{
+                    }
+                    else
+                    {
                         throw new Exception($"Não foram encontradas mudanças para salvar.{model.GetType().Name}[{i}]");
                     }
                 }
@@ -351,13 +319,13 @@ namespace CORE.MVC
                     throw new Exception("throw-validations");
                 }
                 for (int i = 0; i < models.Count(); i++)
-                {                
-                Entity model = models.ElementAt(i);
+                {
+                    Entity model = models.ElementAt(i);
                     var Table = DatabaseModel.Instance.Tables.GetTable(model.GetType());
                     if (model.IsChanged || (model.RowNumber > 0 && Table.Fks.Count > 0))
                     {
-                    SaveAux(model, cascade, Table);
-                    //model.PreserveState();
+                        SaveAux(model, cascade, Table);
+                        //model.PreserveState();
                     }
                 }
 
@@ -394,14 +362,14 @@ namespace CORE.MVC
                     catch (Exception ex_fk)
                     {
                     }
-                    if(model != null)
-                    model.Set(Models[i]);
+                    if (model != null)
+                        model.Set(Models[i]);
                 }
                 if (comit && Connection.GlobalTransaction == false && Connection.UseTransaction)
                 {
                     Connection.Rollback();
                 }
-               
+
             }
             return rs;
         }
@@ -425,15 +393,16 @@ namespace CORE.MVC
         /// </summary>
         /// <param name="model"></param>
         /// <param name="Parentkey"></param>
-        private void SaveForeignAux<T>(T model,bool cascade_save ,bool Parentkey) where T:notnull{
-            
-        if (cascade_save)
+        private void SaveForeignAux<T>(T model, bool cascade_save, bool Parentkey) where T : notnull
+        {
+
+            if (cascade_save)
             {
                 var Table = DatabaseModel.Instance.Tables.GetTable(model.GetType());
 
                 var fks = Parentkey ? Table.ForeignKeyParents() : Table.ForeignKeyChields();
                 //foreach (var item in Table.Fks.Where(i => (Parentkey == false && string.IsNullOrWhiteSpace(i.Value.Fields.ParentKey)) || (Parentkey && !string.IsNullOrWhiteSpace(i.Value.Fields.ParentKey))).ToList())
-                foreach (var item in fks.Where(i=>i.Value.IsNotSave==false).ToList())
+                foreach (var item in fks.Where(i => i.Value.IsNotSave == false).ToList())
                 {
                     var prop = model.GetType().GetProperty(item.Key);
                     var tbFK = DatabaseModel.Instance.Tables.GetTable(item.Value.TypeModel);
@@ -443,13 +412,13 @@ namespace CORE.MVC
                     if (prop.IsCollections() && val != null)
                     {
                         Object[] list = ((IEnumerable<Object>)val).ToArray();
-                        
+
                         for (int i = 0; i < list.Length; i++)
-                        {   
+                        {
                             var mod = list[i] as Entity;
                             mod.db_ = this;
                             var type = list[i].GetType();
-                            if (mod!=null && mod.IsChanged)
+                            if (mod != null && mod.IsChanged)
                             {
                                 setDefaultValues(list[i], item.Value.Fields);
 
@@ -463,7 +432,7 @@ namespace CORE.MVC
                                     throw new Exception(mod.Validation.Error);
                                 }
                                 SaveAux(list[i], cascade_save, tbFK);
-                                if (item.Value.Fields.IsChield==false)
+                                if (item.Value.Fields.IsChield == false)
                                 {
                                     model.SetValueProperty(item.Value.Fields.ForeignKey, list[i].GetValueProperty(tbFK.PrimaryKey.Property.Name));
                                 }
@@ -489,7 +458,7 @@ namespace CORE.MVC
                             SaveAux((dynamic)val, cascade_save, tbFK);
                             //mod.PreserveState();
                             //if (item.Value.Fields.IsChield == false)
-                            if (item.Value.Fields.IsChield==false)
+                            if (item.Value.Fields.IsChield == false)
                             {
                                 model.SetValueProperty(item.Value.Fields.ForeignKey, val.GetValueProperty(tbFK.PrimaryKey.Name));
                             }
@@ -499,25 +468,28 @@ namespace CORE.MVC
             }
         }
         List<string> tbNameList = new List<string>();
-        void setDefaultValues(object model,FkAttribute fk){
-            if(model!=null && fk!=null && fk.DefaultValues!=null){
+        void setDefaultValues(object model, FkAttribute fk)
+        {
+            if (model != null && fk != null && fk.DefaultValues != null)
+            {
                 foreach (var item in fk.DefaultValues)
-                {   
+                {
                     model.SetValueProperty(item.Key, item.Value);
                 }
             }
         }
-        void SetTbNameTransactionID(string name){
+        void SetTbNameTransactionID(string name)
+        {
             //if(tbNameList.Contains(name) == false){
             //    tbNameList.Add(name);
             //}
         }
-        private void SaveAux<T>(T model, bool cascade, DatabaseModel.Table table) where T:notnull
+        private void SaveAux<T>(T model, bool cascade, DatabaseModel.Table table) where T : notnull
         {
             var type = model.GetType();
             Entity entity = ((Entity)((object)model));
             bool IsChanged = entity.IsChanged;
-            
+
             if (entity.RowNumber > 0 || IsChanged)
             {
                 entity.IsManipulated = true;
@@ -528,7 +500,7 @@ namespace CORE.MVC
 
                 bool rs = entity.RowNumber > 0; //GetSaveAuxInsertOrUpdate(model);
                 if (IsChanged)
-                {   
+                {
                     if (rs == false)
                     {
                         InsertAux(model, table);
@@ -546,40 +518,39 @@ namespace CORE.MVC
             //    throw new Exception("Action não especificado.");
             //}
         }
-        private void InsertAux<T>(T model,DatabaseModel.Table table) where T:notnull
+        private void InsertAux<T>(T model, DatabaseModel.Table table) where T : notnull
         {
             model.CallMedthod("TriggerBeforeInsert");
-            model.CallMedthod("TriggerBeforeSave");  
+            model.CallMedthod("TriggerBeforeSave");
             model.SetValueProperty("Status", Entity.State.Active);
 
-            if (table.PrimaryKey.AutoIncrement==Entity.PK.Application)
+            if (table.PrimaryKey.AutoIncrement == Entity.PK.Application)
             {
                 var id = Generation.ID;
                 model.SetValueProperty(table.PrimaryKey.Name, id);
                 model.SetValueProperty("RowNumber", id);
             }
-            Data.Connection.ChangeDatabase(table.Database);
+            //Data.Connection.ChangeDatabase(table.Database);
             List<DataParameter> parameters = new List<DataParameter>();
             if (table.PrimaryKey.AutoIncrement == Entity.PK.Database)
             {
-               var id = Data.InsertWithIdentity(model);
-               model.SetValueProperty(table.PrimaryKey.Name, id);
-               model.SetValueProperty("RowNumber", id);
+                var id = Data.InsertWithIdentity(model);
+                model.SetValueProperty(table.PrimaryKey.Name, id);
+                model.SetValueProperty("RowNumber", id);
             }
             else
             {
                 Data.Insert(model);
             }
-
             //model.SetValueProperty("RowNumber", RowNumber);
             model.CallMedthod("TriggerAfterInsert");
             model.CallMedthod("TriggerAfterSave");
         }
 
         private void UpdateAux(object model, DatabaseModel.Table table)
-        {          
+        {
             var colState = ((Entity)model).SearchStateChange();
-            if(colState.Count ==0 ){ return; }
+            if (colState.Count == 0) { return; }
 
             model.CallMedthod("TriggerBeforeUpdate");
             model.CallMedthod("TriggerBeforeSave");
@@ -608,7 +579,7 @@ namespace CORE.MVC
                             //SqlDbType = col.Type,
                             Value = val ?? DBNull.Value
                         });
-                        
+
                     }
                     else
                     {
@@ -638,7 +609,7 @@ namespace CORE.MVC
             });
             var sq = query.ToString();
             Connection.Execute(query.ToString(), parameters.ToArray());
-            
+
             SetTbNameTransactionID(table.Name);
 
             //model.SetValueProperty("Action", Entity.Config.Action.None);
@@ -648,7 +619,7 @@ namespace CORE.MVC
         }
 
         internal void UpdateTransationID()
-        {            
+        {
             //List<DataParameter> parameters = new List<DataParameter>();
             //StringBuilder query = new StringBuilder();
 
@@ -668,7 +639,7 @@ namespace CORE.MVC
             //tbNameList.Clear();
         }
         internal void ResetTransationID()
-        {            
+        {
             tbNameList.Clear();
         }
 
@@ -729,7 +700,7 @@ namespace CORE.MVC
             //        SqlDbType = col.Type,
             //        Value = (int)Entity.State.Delete
             //    });
-                    
+
             //    parameters.Add(new DataParameter
             //    {
             //        ParameterName = table.PrimaryKey.Name,
@@ -847,7 +818,7 @@ namespace CORE.MVC
             return result;
         }
 
-        public Result Delete(Type type,params object[] key)
+        public Result Delete(Type type, params object[] key)
         {
             var result = new Result();
             var comit = IsMultiplyTransation == false;
@@ -949,7 +920,7 @@ namespace CORE.MVC
         //    var tb = DatabaseModel.Instance.Tables.FirstOrDefault(i => i.Key.FullName == TableName);
         //    return new DataMapper().Find.All(type:tb.Key);
         //}
-        
+
         #endregion
 
         #region Extra
@@ -959,9 +930,38 @@ namespace CORE.MVC
             return this;
         }
 
+        bool disposed;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    //dispose managed resources
+                }
+            }
+            //dispose unmanaged resources
+            Data.Dispose();
+            Data.Dispose();
+            Data_ = null;
+            disposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
         #endregion
+
+        ~DataMapper()
+        {
+            // Finalizer calls Dispose(false)
+            Dispose(false);
+        }
     }
 
-   
+
 
 }

@@ -2,74 +2,34 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CORE.MVC.Reflection
 {
-   internal static class Database
+    internal static class Database
     {
-        public static string[] GetStringByDatabase()
+        public static List<Type> GetDatabasesMapper()
         {
             List<Type> list = new List<Type>();
-            string[] con =null;
 
             list = ReflectionExtension.AssemblyGetTypes(typeof(DataMapper));
-            
-            if(con == null){
-                try
-                {
-                    var mtd_con = list.FirstOrDefault().GetMethod("Initialize", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                    var p = mtd_con.GetParameters();
-                    con = new string[] { p[0].RawDefaultValue?.ToString(), p[1].RawDefaultValue?.ToString() };
-                }
-                catch (Exception)
-                {
-                    con = new string[] { "CORE", "CORE_FRAMEWORK" };
-                }
-            }
 
-            return con;
+            return list;
         }
         public static JsonConfig GetStringByDatabases()
-        {            
-                try
-                {
-                   return System.Text.Json.JsonSerializer.Deserialize<JsonConfig>(File.ReadAllText("core_mvc.json"));
-
-                }
-                catch (Exception)
-                {
+        {
+            try
+            {
+                return System.Text.Json.JsonSerializer.Deserialize<JsonConfig>(File.ReadAllText("core_mvc.json"));
+            }
+            catch (Exception)
+            {
                 return null;
-                   }
-            
+            }
         }
 
-        public static DataMapper[] GetInitializes()
+        public static List<DataMapper> GetInitializes()
         {
             List<Type> list = new List<Type>();
-
-            //var t1 = Assembly.GetEntryAssembly().GetTypes().Distinct().Where(x => typeof(DataMapper).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract && (x.FullName != typeof(DataMapper).FullName)).ToList();
-            //if (t1.Count > 0)
-            //{
-            //    list.AddRange(t1);
-            //}
-
-            //foreach (var item in Assembly.GetEntryAssembly().GetReferencedAssemblies())
-            //{
-            //    var types = Assembly.Load(item).ExportedTypes.Distinct().Where(x => typeof(DataMapper).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract).ToList();
-            //    if (types != null && types.Count() > 0)
-            //    {
-            //        foreach (var t in types)
-            //        {
-            //            if (list.Exists(j => j.FullName == t.FullName) == false)
-            //            {
-            //                list.Add(t);
-            //            }
-            //        }
-            //    }
-            //}
             list = ReflectionExtension.AssemblyGetTypes(typeof(DataMapper));
 
             var op = new List<DataMapper>();
@@ -77,14 +37,34 @@ namespace CORE.MVC.Reflection
             {
                 op.Add((DataMapper)Activator.CreateInstance(item));
             }
-            return op.ToArray();
+            return op;
         }
+
         public static DatabaseModel LoadDatabaseModel()
         {
+            var db_list = GetDatabasesMapper();
+            DatabaseModel database = new DatabaseModel();
+            var db_con_list = GetStringByDatabases();
+            if (db_list == null)
+            {
+                throw new Exception("Arquivo 'core_mvc.json' não encontrado!");
+            }
+            for (int i = 0; i < db_list.Count; i++)
+            {
+                var db_type = db_list[i];
+                var mtd_con = db_type.GetMethod("Initialize", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var p = mtd_con.GetParameters();
+                var name = p[0].RawDefaultValue?.ToString();
+                var conf = db_con_list.Connetions.FirstOrDefault(i => i.Key == name).Value;
+                if (conf == null)
+                {
+                    throw new Exception($"'{db_type.FullName}' chave de conexão não encontrado!");
+                }
+                database.Mapper.Add(db_type, conf);
+            }
+            DatabaseModel.DatabaseBody_ = database;
             var Types = Table.AssemblyFindModels();
             var Views = View.AssemblyFindModels();
-
-            DatabaseModel database = new DatabaseModel();
 
             database.Tables = Table.LoadTables(Types);
             database.Views = View.LoadViews(Views);

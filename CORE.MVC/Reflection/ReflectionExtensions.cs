@@ -1,25 +1,20 @@
-﻿using System;
+﻿using LinqToDB.Mapping;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.Linq.Expressions;
-using System.Data;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using static System.Net.Mime.MediaTypeNames;
-using System.Runtime.Serialization.Json;
+using System.Data;
 using System.IO;
-using System.Drawing;
-using LinqToDB.Mapping;
-using static CORE.MVC.DatabaseModel;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace CORE.MVC
 {
     public static class ReflectionExtension
     {
-        public static List<Type> AssemblyGetTypes(Type filter){
+        public static List<Type> AssemblyGetTypes(Type filter)
+        {
             List<Type> list = new List<Type>();
             string codeBase = Assembly.GetExecutingAssembly().Location;
             UriBuilder uri = new UriBuilder(codeBase);
@@ -28,10 +23,11 @@ namespace CORE.MVC
             foreach (var dll in dlls)
             {
                 var assembly = Assembly.LoadFile(dll.FullName);
-               var tmp_list = assembly.ExportedTypes.Distinct().Where(x => filter.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract && (x.FullName != filter.FullName)).ToList();
-               if(tmp_list!=null && tmp_list.Count > 0){
+                var tmp_list = assembly.ExportedTypes.Distinct().Where(x => filter.IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract && (x.FullName != filter.FullName)).ToList();
+                if (tmp_list != null && tmp_list.Count > 0)
+                {
                     list.AddRange(tmp_list);
-               }
+                }
             }
             return list.Distinct().ToList();
         }
@@ -48,8 +44,8 @@ namespace CORE.MVC
         }
         internal static string GetColumn(this PropertyInfo prop)
         {
-           return DatabaseModel.Instance.Tables[prop.ReflectedType].GetNameByPropertyMame(prop.Name);
-            
+            return DatabaseModel.Instance.Tables[prop.ReflectedType].GetNameByPropertyMame(prop.Name);
+
         }
         internal static T AttributeValue<T>(this PropertyInfo prop)
         {
@@ -65,7 +61,7 @@ namespace CORE.MVC
 
         internal static DatabaseModel.Column GetColumModel(this PropertyInfo prop)
         {
-            return DatabaseModel.Instance.Tables[prop.ReflectedType].Columns.FirstOrDefault(i=>i.Property.Name==prop.Name);
+            return DatabaseModel.Instance.Tables[prop.ReflectedType].Columns.FirstOrDefault(i => i.Property.Name == prop.Name);
         }
 
         internal static Type GetTypeCollection(this Type type)
@@ -87,7 +83,7 @@ namespace CORE.MVC
             {
                 //var x = prop.PropertyType.GetMethod("GetEnumerator").ReturnType.GetProperty("Current");
                 return prop.PropertyType.GetMethod("GetEnumerator").ReturnType.GetProperty("Current").PropertyType;
-                
+
             }
             catch (Exception)
             {
@@ -102,18 +98,19 @@ namespace CORE.MVC
         {
             return obj.GetValueProperty(name);
         }
-        internal static void SetValueProperty(this object obj,string name,object val)
-        {            
+        internal static void SetValueProperty(this object obj, string name, object val)
+        {
             try
             {
-                PropertyInfo prop = obj.GetType().GetProperty(name,BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public);
+                PropertyInfo prop = obj.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
-                if (Nullable.GetUnderlyingType(prop.PropertyType) != null || val.GetType() == prop.PropertyType) {
+                if (Nullable.GetUnderlyingType(prop.PropertyType) != null || val.GetType() == prop.PropertyType)
+                {
                     prop.SetValue(obj, val, null);
                 }
                 else
                 {
-                    prop.SetValue(obj, Convert.ChangeType(val,prop.PropertyType),null);
+                    prop.SetValue(obj, Convert.ChangeType(val, prop.PropertyType), null);
                 }
             }
             catch (Exception ex)
@@ -134,19 +131,19 @@ namespace CORE.MVC
         }
         internal static object GetValueProperty(this object obj, string name)
         {
-           return obj.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(obj);
+            return obj.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(obj);
         }
-        
+
         internal static Type GetParentObject(this object obj)
         {
-           return obj.GetType().ReflectedType;
+            return obj.GetType().ReflectedType;
         }
         public static List<PropertyInfo> Properties<T>(this Expression<Func<T, object>> selector)
         {
             try
             {
                 var reflec = selector.Body.Type;
-                return reflec.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(i =>!i.PropertyType.IsGenericTypeDefinition && !i.PropertyType.FullName.Contains("Collections") && i.PropertyType.FullName.Contains("System") && !i.PropertyType.IsConstructedGenericType).ToList();
+                return reflec.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(i => !i.PropertyType.IsGenericTypeDefinition && !i.PropertyType.FullName.Contains("Collections") && i.PropertyType.FullName.Contains("System") && !i.PropertyType.IsConstructedGenericType).ToList();
             }
             catch (Exception)
             {
@@ -158,7 +155,7 @@ namespace CORE.MVC
             try
             {
                 //var list = reflec.GetProperties(BindingFlags.Instance|BindingFlags.Public);
-                return reflec.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(i =>(!i.PropertyType.IsGenericTypeDefinition && !i.PropertyType.FullName.Contains("Collections") && i.PropertyType.FullName.Contains("System"))||(i.PropertyType.IsEnum)).ToList();
+                return reflec.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(i => (!i.PropertyType.IsGenericTypeDefinition && !i.PropertyType.FullName.Contains("Collections") && i.PropertyType.FullName.Contains("System")) || (i.PropertyType.IsEnum)).ToList();
             }
             catch (Exception)
             {
@@ -169,7 +166,7 @@ namespace CORE.MVC
         {
             try
             {
-                return reflec.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(i =>i.AttributeValue<LinqToDB.Mapping.AssociationAttribute>()!=null && i.AttributeValue<NotMappedAttribute>()==null).ToList();
+                return reflec.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(i => i.AttributeValue<LinqToDB.Mapping.AssociationAttribute>() != null && i.AttributeValue<NotMappedAttribute>() == null).ToList();
             }
             catch (Exception)
             {
@@ -182,7 +179,7 @@ namespace CORE.MVC
             {
                 //return reflec.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(i => i.AttributeValue<FkAttribute>() != null && i.AttributeValue<NotMappedAttribute>() == null).ToList();
 
-                return reflec.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(i => (i.AttributeValue<LinqToDB.Mapping.AssociationAttribute>() != null && i.AttributeValue<NotMappedAttribute>() == null) || (i.PropertyType.BaseType==typeof(Entity)) || (i.PropertyType.IsClass && i.PropertyType.IsGenericType)).ToList();
+                return reflec.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(i => (i.AttributeValue<LinqToDB.Mapping.AssociationAttribute>() != null && i.AttributeValue<NotMappedAttribute>() == null) || (i.PropertyType.BaseType == typeof(Entity)) || (i.PropertyType.IsClass && i.PropertyType.IsGenericType)).ToList();
             }
             catch (Exception)
             {
@@ -261,16 +258,18 @@ namespace CORE.MVC
                     return false;
             }
         }
-        public static bool IsNull(this Type reflec){
+        public static bool IsNull(this Type reflec)
+        {
             return reflec.Name.ToLower().Contains("string") || reflec.Name.ToLower().Contains("byte") || reflec.FullName.Contains("Nullable");
         }
         public static LinqToDB.DataType DbType(this Type reflec)
         {
-            if (reflec.FullName.Contains("Nullable")){
+            if (reflec.FullName.Contains("Nullable"))
+            {
                 reflec = Nullable.GetUnderlyingType(reflec) ?? reflec; //reflec.GenericTypeArguments[0];
             }
             try
-            {   
+            {
                 if (reflec.GetEnumNames().Length > 0)
                 {
                     return LinqToDB.DataType.Int32;
@@ -278,13 +277,13 @@ namespace CORE.MVC
             }
             catch (Exception)
             {
-                
+
             }
-            if(reflec == typeof(Int32))
+            if (reflec == typeof(Int32))
             {
                 return LinqToDB.DataType.Int32;
             }
-            else if (reflec == typeof(Int64)|| reflec == typeof(long))
+            else if (reflec == typeof(Int64) || reflec == typeof(long))
             {
                 return LinqToDB.DataType.Int64;
             }
@@ -324,7 +323,7 @@ namespace CORE.MVC
             {
                 return "sql_variant";
             }
-            if (reflec == LinqToDB.DataType.Int64 || reflec == LinqToDB.DataType.Int128 || reflec == LinqToDB.DataType.Long )
+            if (reflec == LinqToDB.DataType.Int64 || reflec == LinqToDB.DataType.Int128 || reflec == LinqToDB.DataType.Long)
             {
                 return "BIGINT";
             }
@@ -349,21 +348,22 @@ namespace CORE.MVC
         public static bool Equal(this Type reflec, object obj1, object obj2)
         {
             var pros = reflec.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-                foreach (var item in pros)
+            foreach (var item in pros)
+            {
+                if (obj1.GetValueProperty(item.Name) != (obj2.GetValueProperty(item.Name)))
                 {
-                    if(obj1.GetValueProperty(item.Name)!=(obj2.GetValueProperty(item.Name))){
-                        return false;
-                    }
+                    return false;
                 }
-                return true;            
+            }
+            return true;
         }
 
         #region DataTable
         public static DataTable DataTable<T>(this IEnumerable<T> list)
-        {            
-            return ReflectionExtension.DataTable<T>(list,typeof(T));
+        {
+            return ReflectionExtension.DataTable<T>(list, typeof(T));
         }
-        public static DataTable DataTable<T>(IEnumerable<T> list,Type type)
+        public static DataTable DataTable<T>(IEnumerable<T> list, Type type)
         {
             DataTable table = CreateTable(type);
             Type entityType = typeof(T);
@@ -389,33 +389,37 @@ namespace CORE.MVC
         {
             Type entityType = type; //typeof(T);
             DataTable table = new DataTable(entityType.FullName);
-            
-            var properties = entityType.GetProperties(BindingFlags.Public|BindingFlags.Instance|BindingFlags.GetProperty).Where(a=>a.AttributeValue<DisplayAttribute>()!=null);
+
+            var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetProperty).Where(a => a.AttributeValue<DisplayAttribute>() != null);
             //PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(entityType);
             //foreach (PropertyDescriptor prop in properties)
             if (properties != null)
             {
-                foreach (var prop in properties.OrderBy(a=>a.AttributeValue<DisplayAttribute>().Order).ToList())
+                foreach (var prop in properties.OrderBy(a => a.AttributeValue<DisplayAttribute>().Order).ToList())
                 {
                     if (prop.Name != "Status")
                     {
                         var display = prop.AttributeValue<DisplayAttribute>();
                         var pk = prop.AttributeValue<PkAttribute>();
                         var col = table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
-                        if(string.IsNullOrWhiteSpace(display.Name)==false){
+                        if (string.IsNullOrWhiteSpace(display.Name) == false)
+                        {
                             col.Caption = display.Name;
                         }
-                        if(pk!=null){
+                        if (pk != null)
+                        {
                             table.PrimaryKey = new DataColumn[] { col };
                         }
-                        
+
                         //var col = table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
                         //var display = prop.AttributeValue<DisplayAttribute>();
                         //if (display != null)
                         //{ col.Caption = display.Name; }
                     }
                 }
-            }else{
+            }
+            else
+            {
                 foreach (var prop in entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetProperty))
                 {
                     if (prop.Name != "Status")
@@ -433,29 +437,36 @@ namespace CORE.MVC
         internal static SourceAttribute GetSourceAttribute(this Type reflec)
         {
             var t = reflec.GetTableAttribute();
-            var  tb = new SourceAttribute(t.Database,t.Name,string.IsNullOrWhiteSpace(t.Schema) ? "dbo":t.Schema);
-            
+            var tb = new SourceAttribute(t.Database, t.Name, string.IsNullOrWhiteSpace(t.Schema) ? "dbo" : t.Schema);
+
             return tb;
         }
+        internal static DataMapper GetDataMapper(this Type type)
+        {
+            var db = DatabaseModel.Instance.Mapper.FirstOrDefault(a => a.Key.Module.Name == type.Module.Name);
 
+            return (DataMapper)Activator.CreateInstance(db.Key);
+        }
         internal static TableAttribute GetTableAttribute(this Type reflec)
         {
             TableAttribute tb = reflec.AttributeValue<TableAttribute>();
-            if(tb == null){
-                tb = new TableAttribute { Database=DatabaseConsts.DefaultBD,Name= reflec.Name };
+            var db = reflec.GetJsonConnetion();
+            if (tb == null)
+            {
+                tb = new TableAttribute { Database = db.DatabaseName, Name = reflec.Name };
             }
             if (string.IsNullOrWhiteSpace(tb.Database))
             {
-                tb.Database = DatabaseConsts.DefaultBD;
+                tb.Database = string.IsNullOrWhiteSpace(db.DatabaseName) ? AppDomain.CurrentDomain.FriendlyName.Replace(" ", "_").Split('.')[0]:db.DatabaseName;
             }
-            if (string.IsNullOrWhiteSpace(tb.Name)){ tb.Name = reflec.Name; }
-
-            return  tb;
+            if (string.IsNullOrWhiteSpace(tb.Name)) { tb.Name = reflec.Name; }
+            return tb;
         }
         internal static ColumnAttribute GetColumnAttribute(this PropertyInfo prop)
         {
             ColumnAttribute Column = prop.AttributeValue<ColumnAttribute>();
-            if(Column==null){
+            if (Column == null)
+            {
                 var db_type = prop.PropertyType.DbType();
                 Column = new ColumnAttribute { Name = prop.Name };
             }
@@ -467,7 +478,7 @@ namespace CORE.MVC
         }
         internal static IdentityModeAttribute GetIdentityAttribute(this PropertyInfo prop)
         {
-            return prop.AttributeValue<IdentityModeAttribute>() ?? (prop.AttributeValue<IdentityAttribute>()!=null ? new IdentityModeAttribute():null);
+            return prop.AttributeValue<IdentityModeAttribute>() ?? (prop.AttributeValue<IdentityAttribute>() != null ? new IdentityModeAttribute() : null);
         }
         internal static FkAttribute GetFkAttribute(this PropertyInfo prop)
         {
@@ -481,7 +492,7 @@ namespace CORE.MVC
                     ParentKey = ass.OtherKey
                 };
             }
-            return  new FkAttribute("");
+            return new FkAttribute("");
 
         }
 
@@ -489,20 +500,24 @@ namespace CORE.MVC
         {
             return prop.AttributeValue<NotMappedAttribute>();
         }
-        internal static void CallMedthod(this object model,string name)
+        internal static void CallMedthod(this object model, string name)
         {
-            model.GetType().GetMethod(name, BindingFlags.CreateInstance | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public |BindingFlags.DeclaredOnly)?.Invoke(model, null);           
+            model.GetType().GetMethod(name, BindingFlags.CreateInstance | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly)?.Invoke(model, null);
         }
         #endregion
 
         #region Enums
-        public static int Value(this Entity.State status){
+        public static int Value(this Entity.State status)
+        {
             return (int)status;
         }
         #endregion
 
         #region DatabaseModel
-       
+        public static JsonConnetion GetJsonConnetion(this Type type)
+        { 
+            return DatabaseModel.Instance.Mapper.FirstOrDefault(i => i.Key.Module.Name == type.Module.Name).Value;
+        }
         public static string GetTableShema(this Entity model)
         {
             var tb = DatabaseModel.Instance.Tables.FirstOrDefault(i => i.Key.FullName == model.GetType().FullName);
@@ -511,7 +526,7 @@ namespace CORE.MVC
         internal static List<KeyValuePair<string, DatabaseModel.Table.FK>> ForeignKeyParents(this DatabaseModel.Table table)
         {
             var list = new List<KeyValuePair<string, DatabaseModel.Table.FK>>();
-            foreach (var item in table.Fks.Where(i=>i.Value.IsNotSave==false).ToList())
+            foreach (var item in table.Fks.Where(i => i.Value.IsNotSave == false).ToList())
             {
                 var tbFK = DatabaseModel.Instance.Tables[item.Value.TypeModel];
                 if (tbFK.PrimaryKey.PrimaryKey && (string.IsNullOrWhiteSpace(item.Value.Fields.ParentKey) || item.Value.Fields.ParentKey == tbFK.PrimaryKey.Name))
@@ -523,7 +538,7 @@ namespace CORE.MVC
                 }
             }
             return list;
-           //return table.Fks.Where(i =>i.Value.Fields.IsChield==false).ToList();
+            //return table.Fks.Where(i =>i.Value.Fields.IsChield==false).ToList();
         }
         internal static List<KeyValuePair<string, DatabaseModel.Table.FK>> ForeignKeyChields(this DatabaseModel.Table table)
         {
@@ -531,7 +546,7 @@ namespace CORE.MVC
             foreach (var item in table.Fks.Where(i => i.Value.IsNotSave == false).ToList())
             {
                 var tbFK = DatabaseModel.Instance.Tables[item.Value.TypeModel];
-                if (string.IsNullOrWhiteSpace(item.Value.Fields.ParentKey) == false && ((table.PrimaryKey.Name == item.Value.Fields.ParentKey)|| tbFK.PrimaryKey.Name != item.Value.Fields.ParentKey))
+                if (string.IsNullOrWhiteSpace(item.Value.Fields.ParentKey) == false && ((table.PrimaryKey.Name == item.Value.Fields.ParentKey) || tbFK.PrimaryKey.Name != item.Value.Fields.ParentKey))
                 {
                     var tmp = item.Value.Clone<DatabaseModel.Table.FK>();
                     tmp.Fields.IsChield = true;
@@ -546,7 +561,7 @@ namespace CORE.MVC
         #endregion
 
         #region QueryTranslator
-         
+
         //internal static QueryTranslator.ItemMember PrimaryAlias(this Dictionary<string, QueryTranslator.ItemMember> item)
         //{
         //    return item.FirstOrDefault(i =>i.Key.Split('.').Length==1).Value;
@@ -555,12 +570,12 @@ namespace CORE.MVC
 
         #region Assembly Data
 
-        public static string GetFileName(this Type type,string file)
+        public static string GetFileName(this Type type, string file)
         {
             Assembly assembly = Assembly.GetAssembly(type);
             try
             {
-               return assembly.GetManifestResourceNames().FirstOrDefault(i=>i.Contains($".{file}."));
+                return assembly.GetManifestResourceNames().FirstOrDefault(i => i.Contains($".{file}."));
             }
             catch (Exception ex)
             {
@@ -583,13 +598,13 @@ namespace CORE.MVC
         //        return new Bitmap(reader);
         //    }
         //}
-        public static bool SetFileDiretory(this Type type, string file,string path)
+        public static bool SetFileDiretory(this Type type, string file, string path)
         {
             Assembly assembly = Assembly.GetAssembly(type);
             using (MemoryStream reader = new MemoryStream())
             {
                 reader.WriteTo(assembly.GetManifestResourceStream(file));
-                System.IO.File.WriteAllBytes(path,reader.ToArray());
+                System.IO.File.WriteAllBytes(path, reader.ToArray());
                 return true;
             }
         }
@@ -597,9 +612,10 @@ namespace CORE.MVC
 
         #region Clone
 
-        internal static T Clone<T>(this object model){
+        internal static T Clone<T>(this object model)
+        {
             object tmp = Activator.CreateInstance(model.GetType());
-            foreach (var item in model.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic|BindingFlags.Static))
+            foreach (var item in model.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
             {
                 tmp.SetValueProperty(item.Name, model.GetValueProperty(item.Name));
             }
@@ -610,13 +626,13 @@ namespace CORE.MVC
         /// </summary>
         /// <param name="model">Destino</param>
         /// <param name="source">Origem</param>
-        internal static void Set(this object model,object source)
-        {           
-                foreach (var item in source.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
-                {   
-                    if(item.CanWrite)
+        internal static void Set(this object model, object source)
+        {
+            foreach (var item in source.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+            {
+                if (item.CanWrite)
                     model.SetValueProperty(item.Name, source.GetValueProperty(item.Name));
-                }
+            }
         }
 
         #endregion
@@ -629,7 +645,8 @@ namespace CORE.MVC
         /// <returns>Resultado em bool</returns>
         public static bool Validate(this Result rs)
         {
-            if(rs.Success==false){
+            if (rs.Success == false)
+            {
                 throw rs.Exception == null ? new Exception(rs.Message) : rs.Exception;
             }
             return rs.Success;

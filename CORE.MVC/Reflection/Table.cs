@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using static CORE.MVC.Entity;
 
 namespace CORE.MVC.Reflection
 {
@@ -16,13 +13,13 @@ namespace CORE.MVC.Reflection
         public static List<Type> AssemblyFindModels()
         {
             List<Type> list = new List<Type>();
-            
+
             list = ReflectionExtension.AssemblyGetTypes(typeof(Entity));
-            list.AddRange(new Type[] {
-                 typeof(Models.AutoLog),
-                 typeof(Models.AutoAction),
-                 typeof(Models.Components),
-            });
+            //list.AddRange(new Type[] {
+            //     typeof(Models.AutoLog),
+            //     typeof(Models.AutoAction),
+            //     typeof(Models.Components),
+            //});
 
             return list.Distinct().ToList();
         }
@@ -70,7 +67,6 @@ namespace CORE.MVC.Reflection
 
         public static Dictionary<Type, DatabaseModel.Table> LoadTables(List<Type> Types)
         {
-
             Dictionary<Type, DatabaseModel.Table> tables = new Dictionary<Type, DatabaseModel.Table>(Types.Count);
 
             foreach (var type_model in Types)
@@ -78,13 +74,13 @@ namespace CORE.MVC.Reflection
                 var model = Activator.CreateInstance(type_model).GetType();
 
                 var tb = model.GetSourceAttribute();
-                
+
                 var item = new DatabaseModel.Table
                 {
-                    Database=tb.Database,
-                    SimpleName=tb.ShortName,
-                    ShortName=tb.Name,
-                    Schema=tb.Schema,
+                    Database = tb.Database,
+                    SimpleName = tb.ShortName,
+                    ShortName = tb.Name,
+                    Schema = tb.Schema,
                     Name = tb.FullName,
                     TempName = tb.TempFullName,
                     Columns = model.Properties().LoadColumns()
@@ -95,15 +91,16 @@ namespace CORE.MVC.Reflection
                     var fk = new DatabaseModel.Table.FK();
                     fk.Fields = x.GetFkAttribute();
                     fk.TypeModel = x.GetTypeCollection();
-                    fk.IsNotSave = x.AttributeValue<NotSaveAttribute>()!=null;
+                    fk.IsNotSave = x.AttributeValue<NotSaveAttribute>() != null;
                     //fk.Fields.IsChield = (item.PrimaryKey.AutoIncrement.HasValue && item.PrimaryKey.Name == fk.Fields.ForeignKey);
                     //fk.Fields.IsChield = (item.PrimaryKey.i && item.PrimaryKey.Name == fk.Fields.ForeignKey);
-                    if(item.PrimaryKey.PrimaryKey && (item.PrimaryKey.Name==fk.Fields.ForeignKey)){
+                    if (item.PrimaryKey.PrimaryKey && (item.PrimaryKey.Name == fk.Fields.ForeignKey))
+                    {
                         fk.Fields.IsChield = true;
                     }
                     item.Fks.Add(x.Name, fk);
                 }
-                tables.Add(model,item);
+                tables.Add(model, item);
             }
             return tables;
         }

@@ -1,13 +1,9 @@
-﻿using LinqToDB;
-using LinqToDB.Mapping;
+﻿using LinqToDB.Mapping;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CORE.MVC
 {
@@ -20,7 +16,7 @@ namespace CORE.MVC
         internal DataMapper db_ = null; //DatabaseModel.DataMapper;
         [NotMapped]
         internal Validation Validation_ = null;
-        [Column,NotNull]
+        [Column, NotNull]
         public DateTime DateCreated { get; set; } = DateTime.Now;
         /// <summary>
         /// Estado do registo na base de dados
@@ -34,19 +30,25 @@ namespace CORE.MVC
         internal int RowNumber { get; set; }
 
         [NotMapped]
-        internal bool IsChanged { get {
-            var rs = SearchStateChange().Count > 0;
+        internal bool IsChanged
+        {
+            get
+            {
+                var rs = SearchStateChange().Count > 0;
                 var tb = DatabaseModel.Instance.Tables.GetTable(GetType()).Fks.Count;
-            return rs || tb > 0;
-        } }
+                return rs || tb > 0;
+            }
+        }
         [NotMapped]
         internal bool IsManipulated = false;
         [NotMapped]
         Dictionary<string, object> StateFields = new Dictionary<string, object>();
-        public Entity() {        
+        public Entity()
+        {
             PreserveState();
         }
-        public bool Changed(){
+        public bool Changed()
+        {
             return IsChanged;
         }
         public Models.AutoNumberLog Generate(Models.AutoNumber.Type type)
@@ -60,35 +62,52 @@ namespace CORE.MVC
         /// <returns>Devolve um objeto do tipo 'Result'</returns>
         public Result Save(bool cascade = true)
         {
-            return DataMapper.Save(this,cascade);
+            Result rs = null;
+            if (db_ == null || db_.IsMultiplyTransation==false)
+            {
+                using (var db = DataMapper)
+                {
+                    rs = DataMapper.Save(this, cascade);
+                }
+            }
+            else
+            {
+                rs = DataMapper.Save(this, cascade);
+            }
+            return rs;
         }
         [NotMapped]
-        public Validation Validation { 
+        public Validation Validation
+        {
             get
             {
-                Validation_= Validation_ ?? new Validation(this);
+                Validation_ = Validation_ ?? new Validation(this);
 
                 return Validation_;
-            } 
+            }
         }
         [NotMapped]
         protected DataMapper DataMapper
         {
             get
-            {               
-                return db_ ?? new DataMapper();
+            {   if(db_==null || db_.Data == null)
+                {
+                    db_= this.GetType().GetDataMapper();
+                }
+                return db_;
             }
         }
 
-        public Entity Clone(){
+        public Entity Clone()
+        {
             return this.MemberwiseClone() as Entity;
         }
-
         #region State Field
-        internal void PreserveState(){
+        internal void PreserveState()
+        {
             StateFields.Clear();
             foreach (var item in GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-            {   
+            {
                 if (item.CustomAttributes.Any(a => a.AttributeType == typeof(ColumnAttribute)))
                 //if (item.CustomAttributes.Any(a => a.AttributeType != typeof(NotMappedAttribute)))
                 {
@@ -96,14 +115,14 @@ namespace CORE.MVC
                 }
             }
         }
-        internal Dictionary<string,object> SearchStateChange()
+        internal Dictionary<string, object> SearchStateChange()
         {
             Type type = GetType();
             Dictionary<string, object> tmp = new Dictionary<string, object>();
             foreach (var item in StateFields)
-            {   
+            {
                 object val = type.GetProperty(item.Key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(this);
-                if (Equals(val,item.Value)== false /*&& item.Key != "TransactionID"*/)
+                if (Equals(val, item.Value) == false /*&& item.Key != "TransactionID"*/)
                 {
                     tmp.Add(item.Key, val);
                 }
@@ -198,7 +217,7 @@ namespace CORE.MVC
         /// </summary>
         protected virtual void Log()
         {
-            
+
         }
         #endregion
 
@@ -214,7 +233,7 @@ namespace CORE.MVC
             Cascade,
             SetNull
         }
-        
+
         public enum State
         {
             Active = 1,
@@ -228,7 +247,49 @@ namespace CORE.MVC
         #endregion
 
         #region Pesquisa
-       
+
         #endregion
+        private bool isDisposed;
+        private IntPtr nativeResource = Marshal.AllocHGlobal(100);
+        //private AnotherResource managedResource = new AnotherResource();
+
+        // Dispose() calls Dispose(true)
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        protected virtual void Dispose(bool disposing)
+        {
+            if (isDisposed) return;
+
+            if (disposing)
+            {
+                // free managed resources
+                //managedResource.Dispose();
+            }
+
+            // free native resources if there are any.
+            if (nativeResource != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(nativeResource);
+                nativeResource = IntPtr.Zero;
+            }
+
+            isDisposed = true;
+            if (db_ != null)
+                db_.Dispose();
+        }
+
+        // NOTE: Leave out the finalizer altogether if this class doesn't
+        // own unmanaged resources, but leave the other methods
+        // exactly as they are.
+        ~Entity()
+        {
+            // Finalizer calls Dispose(false)
+            Dispose(false);
+        }
     }
 }

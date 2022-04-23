@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CORE.MVC.Models
 {
     [Source(Constants.Database)]
-     class AutoAction:Entity
+    class AutoAction : Entity
     {
         [Pk(PK.Database)]
         public int IDAutoAction { get; set; }
@@ -40,7 +36,7 @@ namespace CORE.MVC.Models
             auto.Tipo = Tipo;
             return auto;
         }
-        public static bool IsExecute(string Database,Type Tipo)
+        public static bool IsExecute(string Database, Type Tipo)
         {
             //return DataMapper<AutoAction>.Find.Exists(i =>i.DbName==Database && i.Tipo == Tipo && i.DataExec.HasValue);
             return true;

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CORE.MVC.Reflection
 {
@@ -13,8 +10,8 @@ namespace CORE.MVC.Reflection
         public static List<Type> AssemblyFindModels()
         {
             List<Type> list = new List<Type>();
-            
-           list = ReflectionExtension.AssemblyGetTypes(typeof(MVC.View));
+
+            list = ReflectionExtension.AssemblyGetTypes(typeof(MVC.View));
 
             return list.Distinct().ToList();
         }
@@ -44,7 +41,8 @@ namespace CORE.MVC.Reflection
 
                 string fileName = model.GetFileName(model.Name);
                 string fileSql = model.FileReadLine(fileName);
-                item.File = new DatabaseModel.File {
+                item.File = new DatabaseModel.File
+                {
                     Name = fileName,
                     Sql = fileSql
                 };

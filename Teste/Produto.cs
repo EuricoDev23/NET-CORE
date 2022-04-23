@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LinqToDB.Mapping;
+﻿using LinqToDB.Mapping;
 
 namespace TESTE
 {
-   [Table]
-   public class Produto:CORE.MVC.Entity
+    [Table]
+    public class Produto : CORE.MVC.Entity
     {
         [PrimaryKey, Identity]
         public int ProductID { get; set; }
@@ -17,6 +12,9 @@ namespace TESTE
         public string Nome { get; set; }
         [Column]
         public int? IDCategoria { get; set; }
+
+        [Column, NotNull]
+        public bool IsStock { get; set; }
 
         [Association(ThisKey = nameof(IDCategoria), OtherKey = nameof(TESTE.Categoria.IDCategoria))]
         public Categoria Categoria { get; set; }

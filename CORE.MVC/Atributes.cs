@@ -1,15 +1,12 @@
-﻿using System.Text.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 using static CORE.MVC.Entity;
 
 namespace CORE.MVC
 {
-   [AttributeUsage(AttributeTargets.Class)]
-   public class SourceAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class)]
+    public class SourceAttribute : Attribute
     {
         internal string Database { get; set; }
         internal string Name { get; set; }
@@ -54,8 +51,8 @@ namespace CORE.MVC
             this.Name = Name;
             this.Schema = "dbo";
         }
-        
-        public SourceAttribute(string Database, string Name, string Schema="dbo")
+
+        public SourceAttribute(string Database, string Name, string Schema = "dbo")
         {
             this.Database = Database;
             this.Name = Name;
@@ -90,12 +87,12 @@ namespace CORE.MVC
         {
             this.AutoIncrement = AutoIncrement;
         }
-        
+
 
     }
     public class IdentityModeAttribute : Attribute
     {
-        internal Entity.PK AutoIncrement=PK.Database;
+        internal Entity.PK AutoIncrement = PK.Database;
 
         /// <summary>
         /// Primary Key
@@ -119,16 +116,16 @@ namespace CORE.MVC
         internal string ForeignKey;
         internal string ParentKey;
         internal bool IsChield;
-        internal Entity.OnDelete DeleteMode=OnDelete.Default;
-        internal Dictionary<string, object> DefaultValues=null;
+        internal Entity.OnDelete DeleteMode = OnDelete.Default;
+        internal Dictionary<string, object> DefaultValues = null;
         internal FkAttribute() { }
         public static string DefaultValue(string Campo, object Value)
         {
             Dictionary<string, object> values = new Dictionary<string, object>();
             values.Add(Campo, Value);
-            return System.Text.Json.JsonSerializer.Serialize(values,values.GetType());
+            return System.Text.Json.JsonSerializer.Serialize(values, values.GetType());
         }
-        public FkAttribute(string ForeignKey, Entity.OnDelete OnDelete=OnDelete.Default)
+        public FkAttribute(string ForeignKey, Entity.OnDelete OnDelete = OnDelete.Default)
         {
             DeleteMode = OnDelete;
             this.ForeignKey = ForeignKey;
@@ -172,11 +169,13 @@ namespace CORE.MVC
                 this.DefaultValues = null;
             }
         }
-        public static object Values(object m){
+        public static object Values(object m)
+        {
             return m;
         }
     }
-    internal static class FkAttributeExtension{
+    internal static class FkAttributeExtension
+    {
 
         public static string Value(this Entity.OnDelete on)
         {
@@ -244,7 +243,8 @@ namespace CORE.MVC
     /// <summary>
     /// Não incluir na base de dados
     /// </summary>
-    public sealed class NotMappedAttribute : Attribute {
+    public sealed class NotMappedAttribute : Attribute
+    {
     }
     public sealed class NotSaveAttribute : Attribute
     {

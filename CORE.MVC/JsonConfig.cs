@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace CORE.MVC
 {
-   public class JsonConfig
+    public class JsonConfig
     {
         public Dictionary<string, JsonConnetion> Connetions { get; set; }
     }

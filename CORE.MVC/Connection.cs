@@ -1,11 +1,7 @@
-﻿using System;
+﻿using LinqToDB.Data;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Data;
-using Microsoft.Data.SqlClient;
-using System.Text;
-using System.Threading.Tasks;
-using LinqToDB.Data;
 //using Microsoft.SqlServer.Management.Smo;
 //using Microsoft.SqlServer.Management.Common;
 
@@ -21,16 +17,16 @@ namespace CORE.MVC
         private DataConnectionTransaction transaction = null;
         private long tranID;
         #endregion
-        DataConnection data=null;
+        DataConnection data = null;
         #region Propriedades
         public bool UseTransaction { get { return transaction != null; } }
         internal bool GlobalTransaction { get; set; }
-        public long? TransactionID { get { return tranID == 0 ? default(long?): tranID; } }
+        public long? TransactionID { get { return tranID == 0 ? default(long?) : tranID; } }
         #endregion
         //internal DataMapper dataMapper;
         #region Conexão
         public Connection()
-        {   
+        {
             //server = new Server(new ServerConnection(new SqlConnection(con.ConnectionString)));
         }
         /// <summary>
@@ -42,19 +38,19 @@ namespace CORE.MVC
             this.data = data;
         }
 
-        
+
         /// <summary>
         /// Cria um SqlCommand associado a conexão actual
         /// </summary>
         /// <returns></returns>
-        public IDbCommand CreateComand(bool UseTransaction=true)
+        public IDbCommand CreateComand(bool UseTransaction = true)
         {
-                //SqlCommand cmd = new SqlCommand();
-                var cmd = data.CreateCommand();
-                cmd.Parameters.Clear();
-                //cmd.Connection = con;
-                //UseTransaction && this.UseTransaction ? transaction : null;
-                return cmd;
+            //SqlCommand cmd = new SqlCommand();
+            var cmd = data.CreateCommand();
+            cmd.Parameters.Clear();
+            //cmd.Connection = con;
+            //UseTransaction && this.UseTransaction ? transaction : null;
+            return cmd;
         }
         #endregion
 
@@ -108,11 +104,12 @@ namespace CORE.MVC
 
         #region Comando
 
-        public bool ExistsDatabase(string name){
+        public bool ExistsDatabase(string name)
+        {
 
             try
             {
-                return Execute<bool>($"SELECT CONVERT(BIT, 1) FROM sys.databases WHERE name = N'{name.Replace("[","").Replace("]","")}'");
+                return Execute<bool>($"SELECT CONVERT(BIT, 1) FROM sys.databases WHERE name = N'{name.Replace("[", "").Replace("]", "")}'");
             }
             catch
             {
@@ -124,7 +121,7 @@ namespace CORE.MVC
         //{
         //   return server.ConnectionContext.ExecuteNonQuery(query) != 0;
         //}
-  
+
         /// <summary>
         /// Executa query na base de dados
         /// </summary>
@@ -133,8 +130,8 @@ namespace CORE.MVC
         /// <returns></returns>
         public bool Execute(string Query, params DataParameter[] Parameters)
         {
-                Parameters = Parameters ?? new DataParameter[0];
-                return data.Execute(Query,Parameters) > -1;
+            Parameters = Parameters ?? new DataParameter[0];
+            return data.Execute(Query, Parameters) > -1;
         }
         /// <summary>
         /// Executa query na base de dados
@@ -150,7 +147,7 @@ namespace CORE.MVC
 
                 foreach (var item in Query)
                 {
-                   a= data.Execute(item, Parameters);
+                    a = data.Execute(item, Parameters);
                     if (a == -1)
                         break;
                 }
@@ -167,9 +164,9 @@ namespace CORE.MVC
         /// <returns></returns>
         public T Execute<T>(string Query, params DataParameter[] Parameters)
         {
-                Parameters = Parameters ?? new DataParameter[0];
-                var v = data.Execute<T>(Query, Parameters);
-                return v == null ? default(T):v;
+            Parameters = Parameters ?? new DataParameter[0];
+            var v = data.Execute<T>(Query, Parameters);
+            return v == null ? default(T) : v;
         }
         /// <summary>
         /// Executa query e retorna os dados como DataTable
@@ -178,11 +175,11 @@ namespace CORE.MVC
         /// <param name="Parameters">Parametros da query</param>
         /// <returns></returns>
         public DataTable ExecuteDataTable(string Query, params DataParameter[] Parameters)
-        {            
+        {
             List<DataTable> list = new List<DataTable>();
 
             DataTable table = new DataTable();
-            return table == null ? new DataTable():table;
+            return table == null ? new DataTable() : table;
         }
 
         /// <summary>

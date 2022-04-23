@@ -3,7 +3,7 @@
     "TESTE": {
       "Provider": "SqlServer",
       "ConnectionString": "Server=.\\sqlexpress;Database=master;Trusted_Connection=True;Enlist=False;",
-      "DatabaseName": "TESTE"
+      "DatabaseName": "TESTE_1"
     }
     }
 }

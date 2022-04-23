@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CORE.MVC.Models
 {
-   [Source(Constants.Database)]
-   public class AutoNumberLog: Entity
+    [Source(Constants.Database)]
+    public class AutoNumberLog : Entity
     {
         [Pk(PK.Database)]
         public int IDAutoNumberLog { get; set; }

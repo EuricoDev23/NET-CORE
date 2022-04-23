@@ -1,0 +1,2 @@
+A conectar-se ao servidor
+A extrair componentes do banco de dados
