@@ -98,6 +98,11 @@ namespace CORE.MVC
                 return null;
             }
         }
+        public Table GetTable(Type type)
+        {
+            return Instance.Tables.FirstOrDefault(a => a.Key.FullName == type.FullName).Value;
+
+        }
 
         #region Classes
 

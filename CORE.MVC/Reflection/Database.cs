@@ -52,15 +52,22 @@ namespace CORE.MVC.Reflection
             for (int i = 0; i < db_list.Count; i++)
             {
                 var db_type = db_list[i];
-                var mtd_con = db_type.GetMethod("Initialize", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                var p = mtd_con.GetParameters();
-                var name = p[0].RawDefaultValue?.ToString();
-                var conf = db_con_list.Connetions.FirstOrDefault(i => i.Key == name).Value;
-                if (conf == null)
+                if (db_type.BaseType.Name == typeof(DataMapper).Name)
                 {
-                    throw new Exception($"'{db_type.FullName}' chave de conexão não encontrado!");
+                    var mtd_con = db_type.GetMethod("Initialize", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    var p = mtd_con.GetParameters();
+                    var name = p[0].RawDefaultValue?.ToString();
+                    var conf = db_con_list.Connetions.FirstOrDefault(i => i.Key == name).Value;
+                    if (conf == null)
+                    {
+                        throw new Exception($"'{db_type.FullName}' chave de conexão não encontrado!");
+                    }
+                    database.Mapper.Add(db_type, conf);
                 }
-                database.Mapper.Add(db_type, conf);
+            }
+            if(database.Mapper.Count == 0)
+            {
+                throw new Exception($"Nenhum DataMaper foi encontrado!");
             }
             DatabaseModel.DatabaseBody_ = database;
             var Types = Table.AssemblyFindModels();

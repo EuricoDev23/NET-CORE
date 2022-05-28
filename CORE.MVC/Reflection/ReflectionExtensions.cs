@@ -61,7 +61,7 @@ namespace CORE.MVC
 
         internal static DatabaseModel.Column GetColumModel(this PropertyInfo prop)
         {
-            return DatabaseModel.Instance.Tables[prop.ReflectedType].Columns.FirstOrDefault(i => i.Property.Name == prop.Name);
+            return DatabaseModel.Instance.Tables.FirstOrDefault(a=>a.Key.FullName == prop.ReflectedType.FullName).Value.Columns.FirstOrDefault(i => i.Property.Name == prop.Name);
         }
 
         internal static Type GetTypeCollection(this Type type)
@@ -98,19 +98,31 @@ namespace CORE.MVC
         {
             return obj.GetValueProperty(name);
         }
+        internal static object CreateInstanteClass(this Type type)
+        {
+            var nome = type.AssemblyQualifiedName;
+            Assembly assem = type.Assembly;
+            object obj = Activator.CreateInstance(Type.GetType(nome));
+            return obj;
+        }
+
         internal static void SetValueProperty(this object obj, string name, object val)
         {
             try
             {
                 PropertyInfo prop = obj.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                Type type = prop.PropertyType;
+                
+                if (type.IsGenericType)
+                    type = type.GetGenericArguments()[0];
 
-                if (Nullable.GetUnderlyingType(prop.PropertyType) != null || val.GetType() == prop.PropertyType)
+                if (Nullable.GetUnderlyingType(prop.PropertyType) != null || val.GetType().FullName == prop.PropertyType.FullName)
                 {
-                    prop.SetValue(obj, val, null);
+                    prop.SetValue(obj, val,null);
                 }
                 else
                 {
-                    prop.SetValue(obj, Convert.ChangeType(val, prop.PropertyType), null);
+                    prop.SetValue(obj, Convert.ChangeType(val, type), null);
                 }
             }
             catch (Exception ex)
@@ -171,6 +183,18 @@ namespace CORE.MVC
             catch (Exception)
             {
                 return new List<PropertyInfo>(0);
+            }
+        }
+        internal static DatabaseModel.Table TableModel(this Type reflec)
+        {
+            try
+            {
+
+                return DatabaseModel.Instance.GetTable(reflec);
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
         public static List<PropertyInfo> PropertiesGenerics(this Type reflec)
@@ -445,7 +469,7 @@ namespace CORE.MVC
         {
             var db = DatabaseModel.Instance.Mapper.FirstOrDefault(a => a.Key.Module.Name == type.Module.Name);
 
-            return (DataMapper)Activator.CreateInstance(db.Key);
+            return (DataMapper)db.Key.CreateInstanteClass();
         }
         internal static TableAttribute GetTableAttribute(this Type reflec)
         {
@@ -614,12 +638,17 @@ namespace CORE.MVC
 
         internal static T Clone<T>(this object model)
         {
-            object tmp = Activator.CreateInstance(model.GetType());
+            return (T)model.Clone(typeof(T));
+        }
+        internal static object Clone(this object model,Type type)
+        {
+            object tmp = Activator.CreateInstance(type);
             foreach (var item in model.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
             {
-                tmp.SetValueProperty(item.Name, model.GetValueProperty(item.Name));
+                if (item.CanWrite)
+                    tmp.SetValueProperty(item.Name, model.GetValueProperty(item.Name));
             }
-            return (T)tmp;
+            return tmp;
         }
         /// <summary>
         /// Actualizar objecto

@@ -1,4 +1,5 @@
 ﻿using LinqToDB.Mapping;
+using System.Collections.Generic;
 
 namespace TESTE
 {
@@ -18,6 +19,5 @@ namespace TESTE
 
         [Association(ThisKey = nameof(IDCategoria), OtherKey = nameof(TESTE.Categoria.IDCategoria))]
         public Categoria Categoria { get; set; }
-
     }
 }

@@ -5,9 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CORE.MVC
 {
@@ -19,18 +22,23 @@ namespace CORE.MVC
         DataConnection Data_ = null;
         JsonConnetion Config = null;
 
+        public string GetSql<T>(Expression<Func<T, bool>> expression) where T : class
+        {
+            return new ExtensionSQL.WhereBuilder().ToSql<T>(expression).Where;
+        }
         public ITable<T> Table<T>() where T : class
         {
             return Data.GetTable<T>();
         }
-        public static ITable<T> Search<T>() where T : class
+
+        internal static string GetSQL<T>(Expression<Func<T, bool>> expression) where T : class
         {
             if (DatabaseModel.State != StateMode.Ready)
             {
                 var tb = DatabaseModel.Instance;
                 DatabaseModel.SetStatus(StateMode.None);
-            }           
-            return typeof(T).GetDataMapper().Table<T>();
+            }
+            return typeof(T).GetDataMapper().GetSql<T>(expression);
         }
         public bool ExistsDatabase(string name)
         {
@@ -82,6 +90,13 @@ namespace CORE.MVC
                 return Data_;
             }
         }
+        public Data<T> Find<T>() where T:class {
+          return new Data<T>(this);
+        }
+        //public static Search<T> Search<T>() where T : class
+        //{
+        //    return new Search<T>(new DataMapper());
+        //}
         /// <summary>
         /// Estado do Mapeador de objecto
         /// </summary>
@@ -93,7 +108,7 @@ namespace CORE.MVC
         /// </summary>
         /// <param name="DataBaseName">Nome predefinido da base de dados </param>
         /// <returns></returns>
-        public static Result Start()
+        internal static Result Start()
         {
             var rs = new Result();
             try
@@ -107,7 +122,7 @@ namespace CORE.MVC
             }
             return rs;
         }
-        public static void DropDatabases()
+        internal static void DropDatabases()
         {
             CORE.MVC.Generator.Commands.Database.DropDataBases(new DataMapper());
         }

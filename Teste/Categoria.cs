@@ -1,4 +1,6 @@
-﻿using LinqToDB.Mapping;
+﻿using CORE.MVC;
+using LinqToDB.Mapping;
+using System.Collections.Generic;
 
 namespace TESTE
 {
@@ -9,6 +11,8 @@ namespace TESTE
 
         [Column, NotNull]
         public string Nome { get; set; }
-
+        [Association(ThisKey = nameof(IDCategoria), OtherKey = nameof(Produto.IDCategoria))]
+        [NotSave]
+        public List<Produto> ProdutoList { get; set; }
     }
 }

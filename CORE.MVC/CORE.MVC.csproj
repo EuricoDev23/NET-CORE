@@ -8,6 +8,13 @@
     <Compile Remove="DataMapper - Cópia.cs" />
     <Compile Remove="ExpressionToLinq.cs" />
     <Compile Remove="ExpressionVisitor.cs" />
+    <Compile Remove="ExtensionSQL\ColumnName.cs" />
+    <Compile Remove="ExtensionSQL\Configuration.cs" />
+    <Compile Remove="ExtensionSQL\Entity.cs" />
+    <Compile Remove="ExtensionSQL\IAttributeName.cs" />
+    <Compile Remove="ExtensionSQL\IEntityMap.cs" />
+    <Compile Remove="ExtensionSQL\PropertyEntry.cs" />
+    <Compile Remove="ExtensionSQL\TableName.cs" />
   </ItemGroup>
 
   <ItemGroup>

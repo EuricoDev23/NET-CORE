@@ -1,0 +1,10 @@
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\ExpressionExtensionSQL\bin\Debug\netstandard2.0\ExpressionExtensionSQL.deps.json
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\ExpressionExtensionSQL\bin\Debug\netstandard2.0\ExpressionExtensionSQL.dll
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\ExpressionExtensionSQL\bin\Debug\netstandard2.0\ExpressionExtensionSQL.pdb
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\ExpressionExtensionSQL\obj\Debug\netstandard2.0\ExpressionExtensionSQL.csproj.AssemblyReference.cache
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\ExpressionExtensionSQL\obj\Debug\netstandard2.0\ExpressionExtensionSQL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\ExpressionExtensionSQL\obj\Debug\netstandard2.0\ExpressionExtensionSQL.AssemblyInfoInputs.cache
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\ExpressionExtensionSQL\obj\Debug\netstandard2.0\ExpressionExtensionSQL.AssemblyInfo.cs
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\ExpressionExtensionSQL\obj\Debug\netstandard2.0\ExpressionExtensionSQL.csproj.CoreCompileInputs.cache
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\ExpressionExtensionSQL\obj\Debug\netstandard2.0\ExpressionExtensionSQL.dll
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\ExpressionExtensionSQL\obj\Debug\netstandard2.0\ExpressionExtensionSQL.pdb
