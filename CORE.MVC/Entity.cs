@@ -27,7 +27,7 @@ namespace CORE.MVC
 
         [NotMapped]
         //[Browsable(false)]
-        internal int RowNumber { get; set; }
+        internal long RowNumber { get; set; }
 
         [NotMapped]
         internal bool IsChanged
@@ -35,8 +35,8 @@ namespace CORE.MVC
             get
             {
                 var rs = SearchStateChange().Count > 0;
-                var tb = DatabaseModel.Instance.Tables.GetTable(GetType()).Fks.Count;
-                return rs || tb > 0;
+                //var tb = DatabaseModel.Instance.Tables.GetTable(GetType()).Fks.Count;
+                return rs;// || tb > 0;
             }
         }
         [NotMapped]
@@ -47,14 +47,14 @@ namespace CORE.MVC
         {
             PreserveState();
         }
-        public bool Changed()
+        internal bool Changed()
         {
             return IsChanged;
         }
-        public Models.AutoNumberLog Generate(Models.AutoNumber.Type type)
-        {
-            return Models.AutoNumber.Generate(GetType(), type);
-        }
+        //public Models.AutoNumberLog Generate(Models.AutoNumber.Type type)
+        //{
+        //    return Models.AutoNumber.Generate(GetType(), type);
+        //}
         /// <summary>
         /// Salva os dados no banco 
         /// </summary>
@@ -108,7 +108,7 @@ namespace CORE.MVC
             StateFields.Clear();
             foreach (var item in GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
-                if (item.CustomAttributes.Any(a => a.AttributeType == typeof(ColumnAttribute)))
+                if (item.CustomAttributes.Any(a => a.AttributeType == typeof(ColumnAttribute)) && item.CanWrite)
                 //if (item.CustomAttributes.Any(a => a.AttributeType != typeof(NotMappedAttribute)))
                 {
                     StateFields.Add(item.Name, this.GetValueProperty(item.Name));
@@ -121,7 +121,7 @@ namespace CORE.MVC
             Dictionary<string, object> tmp = new Dictionary<string, object>();
             foreach (var item in StateFields)
             {
-                object val = type.GetProperty(item.Key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(this);
+                object val = this.GetValueProperty(item.Key); //type.GetProperty(item.Key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).GetValue(this);
                 if (Equals(val, item.Value) == false /*&& item.Key != "TransactionID"*/)
                 {
                     tmp.Add(item.Key, val);

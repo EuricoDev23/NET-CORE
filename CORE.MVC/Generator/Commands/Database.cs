@@ -4,6 +4,7 @@ using LinqToDB.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace CORE.MVC.Generator.Commands
@@ -124,10 +125,10 @@ namespace CORE.MVC.Generator.Commands
         {
             return cmd.Replace("GO", "").Replace("go", "");
         }
-        public static bool Create(DataMapper entity)
+        public static bool Create(/*DataMapper entity*/)
         {
             var db = DatabaseModel.Instance;
-
+            DatabaseModel.SetStatus(DataMapper.StateMode.CreateDatabase);
             //entity.Data.StartTransaction();
 
             try
@@ -138,7 +139,8 @@ namespace CORE.MVC.Generator.Commands
                 foreach (var item in db.Databases)
                 {
                     bool create = true;
-
+                    using (var entity = db.Tables.FirstOrDefault(a => a.Value.Database == item.Key).Key.GetDataMapper())
+                    {
                     if (entity.ExistsDatabase(item.Key))
                     {
                         create = false;
@@ -155,55 +157,49 @@ namespace CORE.MVC.Generator.Commands
                         //    //}
                         //}
                     }
+                       
                     if (create)
                     {
                         //Use master
-                        CORE.MVC.Log.Write("A criar banco de dados '" + item.Key + "'");
-                        entity.Data.Connection.ChangeDatabase(DatabaseConsts.Master);
-
-                        entity.Data.Execute(ReplaceGo(Helper.UseMaster));
-                        //generate database
-                        entity.Data.Execute(string.Format("CREATE DATABASE {0};", item.Key));
-                        entity.Data.Execute(string.Format("USE {0};", item.Key));
-                        //generate schema
-                        foreach (var shema in item.Value.Distinct().ToArray())
+                        try
                         {
-                            entity.Data.Execute(string.Format("CREATE SCHEMA {0}; ", shema));
+                            CORE.MVC.Log.Write("A criar banco de dados '" + item.Key + "'");
+                            entity.Data.Connection.ChangeDatabase(DatabaseConsts.Master(entity));
+                            File.WriteAllText("tmp.sql", "");
+                            //entity.Data.Execute(ReplaceGo(Helper.UseMaster));
+                            //generate database
+                            entity.Data.Execute(string.Format("CREATE DATABASE {0};", item.Key));
+                            entity.Data.Execute(string.Format("USE {0};", item.Key));
+                            //generate schema
+                            foreach (var shema in item.Value.Distinct().ToArray())
+                            {
+                                entity.Data.Execute(string.Format("CREATE SCHEMA {0}; ", shema));
+                            }
 
+                            //GENERATED TABLES
+                            foreach (var tb in TableOrderCreate(db.Tables.Where(i => i.Value.Name.Contains(item.Key))))
+                            {
+                                Generator.Commands.Table.Create(entity, tb);
+                                CORE.MVC.Log.Write("'" + item.Key + "': a criar tabela " + tb.Value.Name);
+                            }
+
+                            //GENERATED VIEWS
+                            entity.Data.Execute(string.Format("USE {0};", item.Key));
+
+                            foreach (var view in ViewOrder(db.Views.Where(i => i.Value.FullName.Contains(item.Key)).ToList()))
+                            {
+                                entity.Data.Execute(Generator.Commands.View.Create(view));
+                            }
+                            Debug.WriteLine("base de dados criada com êxito");
+                            //Inicializar bd
+                            entity.Record();
                         }
-
-                        //GENERATED TABLES
-                        foreach (var tb in TableOrderCreate(db.Tables.Where(i => i.Value.Name.Contains(item.Key))))
+                        catch (Exception dbex)
                         {
-                            Generator.Commands.Table.Create(entity, tb);
-                            CORE.MVC.Log.Write("'" + item.Key + "': a criar tabela " + tb.Value.Name);
+                            DropDataBase(entity,item.Key);
                         }
+                    }
 
-                        //GENERATED VIEWS
-                        entity.Data.Execute(string.Format("USE {0};", item.Key));
-
-                        foreach (var view in ViewOrder(db.Views.Where(i => i.Value.FullName.Contains(item.Key)).ToList()))
-                        {
-                            entity.Data.Execute(Generator.Commands.View.Create(view));
-                        }
-
-                        //GENERATED TABLES-TEMP
-                        //if (item.Key.Contains(Constants.Database) == false)
-                        //{
-                        //    entity.Data.Execute(string.Format("USE {0};", Constants.Database));
-
-                        //    foreach (var tb in TableOrderCreate(db.Tables.Where(i => i.Value.Name.Contains(item.Key))))
-                        //    {
-                        //        entity.Data.Execute(Generator.Commands.Table.Create(tb, true));
-                        //    }
-                        //}
-                        //entity.Data.Commit();
-                        entity.Data.Execute(ReplaceGo(Helper.UseMaster));
-
-                        Debug.WriteLine("base de dados criada com êxito");
-                        //Inicializar bd
-                        using (var db2 = db.Tables.FirstOrDefault(a => a.Value.Database == item.Key).Key.GetDataMapper())
-                        { db2.Record(); }
                     }
                 }
 
@@ -211,35 +207,15 @@ namespace CORE.MVC.Generator.Commands
             }
             catch (Exception ex)
             {
-                DropDataBase(entity);
+                //DropDataBase(entity);
                 return false;
             }
         }
 
-        public static void DropDataBase(DataMapper entity)
+        public static void DropDataBase(DataMapper entity,string db)
         {
-            entity.Data.Execute(ReplaceGo(Helper.UseMaster));
-            try
-            {
-                foreach (var item in DatabaseModel.Instance.Databases.Keys.ToList())
-                {
-                    try
-                    {
-                        //if (entity.Find.Exists<AutoAction>(i => i.DbName == item && i.Tipo == AutoAction.Type.WriteData)==false)
-                        {
-                            entity.Data.Execute(ReplaceGo(string.Format(Helper.Drop, item)));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        entity.Data.Execute(ReplaceGo(string.Format(Helper.Drop, item)));
-                    }
-                }
-            }
-            catch
-            {
-
-            }
+            entity.Data.Connection.ChangeDatabase(DatabaseConsts.Master(entity));
+            entity.Data.Execute(ReplaceGo(string.Format(Helper.Drop, db)));
         }
 
         public static void DropDataBases(DataMapper entity)
@@ -267,10 +243,10 @@ namespace CORE.MVC.Generator.Commands
 
             }
         }
-        internal static bool CreateDatabaseInServer(DataMapper entity)
+        internal static bool CreateDatabaseInServer()
         {
             Console.WriteLine(":::A criar base de dados:::");
-            var rs = Create(entity);
+            var rs = Create();
             //if(rs){
             //    Console.WriteLine("base de dados criada com êxito");
             //    AutoAction.ApplyAction(AutoAction.Type.CreateDatabase);

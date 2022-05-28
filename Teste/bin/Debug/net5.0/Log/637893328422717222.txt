@@ -1,0 +1,5 @@
+A conectar-se ao servidor
+A extrair componentes do banco de dados
+A criar banco de dados 'TESTE_1'
+'TESTE_1': a criar tabela TESTE_1.ts.Categoria
+'TESTE_1': a criar tabela TESTE_1.ts.Produto

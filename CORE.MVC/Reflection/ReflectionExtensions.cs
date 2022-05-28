@@ -367,6 +367,10 @@ namespace CORE.MVC
             {
                 return "varchar(50)";
             }
+            if (reflec.ToString().ToLower().Contains("binary"))
+            {
+                return $"{reflec.ToString().ToUpper()}(5)";
+            }
             return reflec.ToString().ToUpper();
         }
         public static bool Equal(this Type reflec, object obj1, object obj2)

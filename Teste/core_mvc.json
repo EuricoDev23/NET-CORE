@@ -4,6 +4,11 @@
       "Provider": "SqlServer",
       "ConnectionString": "Server=.\\sqlexpress;Database=master;Trusted_Connection=True;Enlist=False;",
       "DatabaseName": "TESTE_1"
+    },
+    "TESTE2": {
+      "Provider": "MySql.Data.MySqlClient",
+      "ConnectionString": "Server=localhost;Port=3306;Database=mysql;Uid=root;Pwd=;charset=utf8;",
+      "DatabaseName": "TESTE_1"
     }
-    }
+  }
 }

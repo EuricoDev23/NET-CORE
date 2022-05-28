@@ -3,11 +3,10 @@ using System.Collections.Generic;
 
 namespace TESTE
 {
-    [Table]
     public class Produto : CORE.MVC.Entity
     {
         [PrimaryKey, Identity]
-        public int ProductID { get; set; }
+        public long ProductID { get; set; }
 
         [Column(Length = 100), NotNull]
         public string Nome { get; set; }

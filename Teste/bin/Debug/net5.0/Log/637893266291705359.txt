@@ -1,0 +1,4 @@
+A conectar-se ao servidor
+A extrair componentes do banco de dados
+Unknown database 'teste_1'
+Unknown database 'teste_1'

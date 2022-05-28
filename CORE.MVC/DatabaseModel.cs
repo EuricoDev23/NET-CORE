@@ -11,8 +11,16 @@ namespace CORE.MVC
     {
 
         internal static string DefaultBD = @"core";
-        internal static string Master = @"master";
+        //internal static string Master = @"master";
         internal static JsonConfig JsonConfig = null;
+        public static string Master(DataMapper mapper)
+        {
+            Dictionary<string, string> db = new Dictionary<string, string>();
+            db.Add("sqlserver", "master");
+            db.Add("mysql", "mysql");
+            var sx = db.FirstOrDefault(a => mapper.Config.Provider.ToLower().Contains(a.Key)).Value;
+            return sx;
+        }
         public static Table GetTable(this Dictionary<Type, Table> values, Type type)
         {
             var Table = values.FirstOrDefault(i => i.Key.FullName == type.FullName).Value;
@@ -52,8 +60,7 @@ namespace CORE.MVC
 
                             DatabaseBody_ = Reflection.Database.LoadDatabaseModel();
                             CORE.MVC.Log.Write("A extrair componentes do banco de dados");
-                            state = DataMapper.StateMode.Running;
-                            
+                            state = DataMapper.StateMode.Running;                            
                         }
                     }
                 }

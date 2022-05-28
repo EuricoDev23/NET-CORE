@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <PackageReference Include="linq2db.SqlServer" Version="3.6.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
   </ItemGroup>
 
   <ItemGroup>

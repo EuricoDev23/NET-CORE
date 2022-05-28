@@ -20,7 +20,7 @@ namespace CORE.MVC
     public class DataMapper: IDisposable
     {
         DataConnection Data_ = null;
-        JsonConnetion Config = null;
+       internal JsonConnetion Config = null;
 
         public string GetSql<T>(Expression<Func<T, bool>> expression) where T : class
         {
@@ -58,7 +58,8 @@ namespace CORE.MVC
         {
             None = 0,
             Running = 2,
-            Ready = 3,
+            CreateDatabase = 3,
+            Ready = 4,
             Error = 1
         }
         private Connection db = null;
@@ -72,7 +73,7 @@ namespace CORE.MVC
 
                 if (db == null)
                 {
-                    db = new Connection(Data_);
+                    db = new Connection(Data);
                 }
                 return db;
             }
@@ -176,19 +177,17 @@ namespace CORE.MVC
         {
             try
             {
-                if (DatabaseModel.State < StateMode.Running)
+                var instance = DatabaseModel.Instance;
+
+                if (DatabaseModel.State < StateMode.CreateDatabase)
                 {
-                    var instance = DatabaseModel.Instance;
-                    if (Generator.Commands.Database.CreateDatabaseInServer(this))
+                    if (Generator.Commands.Database.CreateDatabaseInServer())
                     {
                     }
                     DatabaseModel.SetStatus(DataMapper.StateMode.Ready);
                     //Data.Connection.ChangeDatabase(DatabaseConsts.Master);
                 }
-                //else
-                //{
-                //    ////Data.Connection.ChangeDatabase(DatabaseConsts.Master);
-                //}
+                if(DatabaseModel.State==StateMode.Ready)
                 Data.Connection.ChangeDatabase(Config.DatabaseName);
             }
             catch (Exception ex)
@@ -232,23 +231,18 @@ namespace CORE.MVC
                 }
 
                 var Table = DatabaseModel.Instance.Tables.GetTable(type);
-                if (entity.IsChanged || entity.RowNumber > 0)
-                {
-                    entity.db_ = TriggerDataMaper();
+                SaveAux((dynamic)model, cascade, Table);
 
-                    if (entity.Validation.IsValid == false)
-                    {
-                        rs.AddError(entity.Validation.Errors);
-                        throw new Exception("throw-validations");
-                    }
-                    SaveAux((dynamic)model, cascade, Table);
-                    //model.PreserveState();
-                }
-                else
-                {
+                //if (entity.IsChanged || entity.RowNumber > 0)
+                //{
+                   
+                //    //model.PreserveState();
+                //}
+                //else
+                //{
 
-                    throw new Exception("Não foram encontradas mudanças para salvar.");
-                }
+                //    throw new Exception("Não foram encontradas mudanças para salvar.");
+                //}
                 //UpdateTransationID();
 
                 if (comit && Connection.GlobalTransaction == false && Connection.UseTransaction)
@@ -312,7 +306,7 @@ namespace CORE.MVC
                 {
                     Connection.StartInternalTransaction();
                 }
-                for (int i = 0; i < models.Count(); i++)
+               /* for (int i = 0; i < models.Count(); i++)
                 {
                     Entity model = models.ElementAt(i);
                     if (model != null && model.IsChanged)
@@ -332,16 +326,13 @@ namespace CORE.MVC
                 if (rs.Success == false)
                 {
                     throw new Exception("throw-validations");
-                }
+                }*/
                 for (int i = 0; i < models.Count(); i++)
                 {
                     Entity model = models.ElementAt(i);
                     var Table = DatabaseModel.Instance.Tables.GetTable(model.GetType());
-                    if (model.IsChanged || (model.RowNumber > 0 && Table.Fks.Count > 0))
-                    {
-                        SaveAux(model, cascade, Table);
-                        //model.PreserveState();
-                    }
+                    
+                    SaveAux(model, cascade, Table);
                 }
 
                 if (comit && Connection.GlobalTransaction == false && Connection.UseTransaction)
@@ -505,33 +496,33 @@ namespace CORE.MVC
             Entity entity = ((Entity)((object)model));
             bool IsChanged = entity.IsChanged;
 
-            if (entity.RowNumber > 0 || IsChanged)
+            //Salva foreign key parent
+            SaveForeignAux(model, cascade, true);
+
+            if (IsChanged)
             {
                 entity.IsManipulated = true;
 
-                //((Entity)model).TransactionID = Connection.TransactionID;
-                //Salva foreign key parent
-                SaveForeignAux(model, cascade, true);
+                entity.db_ = TriggerDataMaper();
 
-                bool rs = entity.RowNumber > 0; //GetSaveAuxInsertOrUpdate(model);
-                if (IsChanged)
+                if (entity.Validation.IsValid == false)
                 {
-                    if (rs == false)
-                    {
-                        InsertAux(model, table);
-                    }
-                    else
-                    {
-                        UpdateAux(model, table);
-                    }
-                    entity.PreserveState();
+                    //rs.AddError(entity.Validation.Errors);
+                    throw new Exception(entity.Validation.Error); //new Exception("throw-validations");
                 }
+                bool rs = entity.RowNumber > 0; //GetSaveAuxInsertOrUpdate(model);
+                if (rs == false)
+                {
+                    InsertAux(model, table);
+                }
+                else
+                {
+                    UpdateAux(model, table);
+                }
+                entity.PreserveState();
                 //Salva foreign key chield
                 SaveForeignAux(model, cascade, false);
             }
-            //else{
-            //    throw new Exception("Action não especificado.");
-            //}
         }
         private void InsertAux<T>(T model, DatabaseModel.Table table) where T : notnull
         {

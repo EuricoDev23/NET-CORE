@@ -26,7 +26,7 @@ namespace CORE.MVC
         public List<T> All()
         {
             var tb = typeof(T).TableModel();
-            var list = ExecuteReader(typeof(T), $"SELECT {getTop()} * FROM {tb.Name}");
+            var list = ExecuteReader(typeof(T), $"SELECT {getTop()} * FROM {tb.ShortName}");
             return list.Cast<T>().ToList();
         }
         public List<T> All(Expression<Func<T, bool>> where)
@@ -109,11 +109,8 @@ namespace CORE.MVC
                         //throw;
                     }
                 }
-
                 //Carregar Row
-                //object RowNumber = row["RowNumber"];
-                //if (!RowNumber.Equals(DBNull.Value))
-                //{ model.SetValueProperty("RowNumber", RowNumber); }
+                model.SetValueProperty("RowNumber", model.GetValueProperty(tb.PrimaryKey.Name));
 
                 bool FK = true;
 
@@ -167,11 +164,11 @@ namespace CORE.MVC
                                     List<object> dtFK = new List<object>();
                                     if (!string.IsNullOrWhiteSpace(item.Value.Fields.ParentKey))
                                     {
-                                        dtFK = ExecuteReader(item.Value.TypeModel, $"SELECT * FROM {item.Value.TypeModel.TableModel().Name} WHERE {tbFK.GetNameByPropertyMame(item.Value.Fields.ParentKey)} = @val and " + w, parms.ToArray());
+                                        dtFK = ExecuteReader(item.Value.TypeModel, $"SELECT * FROM {item.Value.TypeModel.TableModel().ShortName} WHERE {tbFK.GetNameByPropertyMame(item.Value.Fields.ParentKey)} = @val and " + w, parms.ToArray());
                                     }
                                     else
                                     {
-                                        dtFK = ExecuteReader(item.Value.TypeModel, $"SELECT * FROM {item.Value.TypeModel.TableModel().Name} WHERE {tbFK.PrimaryKey.Name} = @val and " + w, parms.ToArray());
+                                        dtFK = ExecuteReader(item.Value.TypeModel, $"SELECT * FROM {item.Value.TypeModel.TableModel().ShortName} WHERE {tbFK.PrimaryKey.Name} = @val and " + w, parms.ToArray());
                                     }
 
                                     if (dtFK != null && dtFK.Count > 0)

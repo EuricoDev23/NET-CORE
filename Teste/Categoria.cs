@@ -11,8 +11,8 @@ namespace TESTE
 
         [Column, NotNull]
         public string Nome { get; set; }
-        [Association(ThisKey = nameof(IDCategoria), OtherKey = nameof(Produto.IDCategoria))]
+        /*[Association(ThisKey = nameof(IDCategoria), OtherKey = nameof(Produto.IDCategoria))]
         [NotSave]
-        public List<Produto> ProdutoList { get; set; }
+        public List<Produto> ProdutoList { get; set; }*/
     }
 }

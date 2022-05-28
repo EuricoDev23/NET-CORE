@@ -49,6 +49,10 @@
               "target": "Package",
               "version": "[4.1.0, )"
             },
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[8.0.29, )"
+            },
             "linq2db": {
               "target": "Package",
               "version": "[3.6.0, )"
@@ -118,10 +122,6 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
-            "System.Data.SqlClient": {
-              "target": "Package",
-              "version": "[4.8.3, )"
-            },
             "linq2db.SqlServer": {
               "target": "Package",
               "version": "[3.6.0, )"

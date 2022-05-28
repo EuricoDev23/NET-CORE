@@ -2,7 +2,7 @@
 {
     public class TESTEDB : CORE.MVC.DataMapper
     {
-        protected override void Initialize(string ConnectionName = "TESTE")
+        protected override void Initialize(string ConnectionName = "TESTE2")
         {
             this.InsertModel(new Produto()
             {
