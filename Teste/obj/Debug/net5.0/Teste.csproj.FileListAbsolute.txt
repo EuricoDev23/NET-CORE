@@ -66,6 +66,11 @@ C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\TESTE.pdb
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\Azure.Core.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\Azure.Identity.dll
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\BouncyCastle.Crypto.dll
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\Google.Protobuf.dll
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\K4os.Compression.LZ4.dll
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\K4os.Compression.LZ4.Streams.dll
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\K4os.Hash.xxHash.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\linq2db.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\Microsoft.Data.SqlClient.dll
@@ -77,6 +82,9 @@ C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\Microsoft.Win32.SystemEvents.dll
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\MySql.Data.dll
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\Ubiety.Dns.Core.dll
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\ZstdNet.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\System.Configuration.ConfigurationManager.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\System.Drawing.Common.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\System.IdentityModel.Tokens.Jwt.dll
@@ -108,11 +116,3 @@ C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\obj\Debug\net5.0\
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\obj\Debug\net5.0\ref\TESTE.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\obj\Debug\net5.0\TESTE.pdb
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\obj\Debug\net5.0\TESTE.genruntimeconfig.cache
-C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\BouncyCastle.Crypto.dll
-C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\Google.Protobuf.dll
-C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\K4os.Compression.LZ4.dll
-C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\K4os.Compression.LZ4.Streams.dll
-C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\K4os.Hash.xxHash.dll
-C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\MySql.Data.dll
-C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\Ubiety.Dns.Core.dll
-C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\Teste\bin\Debug\net5.0\ZstdNet.dll

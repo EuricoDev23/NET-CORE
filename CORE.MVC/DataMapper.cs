@@ -42,10 +42,14 @@ namespace CORE.MVC
         }
         public bool ExistsDatabase(string name)
         {
-
+            name = name.Replace("[", "").Replace("]", "");
+            Dictionary<string, string> db = new Dictionary<string, string>();
+            db.Add("sqlserver", $"SELECT CONVERT(BIT, 1) FROM sys.databases WHERE name = N'{name}'");
+            db.Add("mysql", $"SELECT CONVERT(BIT, 1) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{name}'");
+            var sx = db.FirstOrDefault(a => Config.Provider.ToLower().Contains(a.Key)).Value;
             try
             {
-                return Data.Execute<bool>($"SELECT CONVERT(BIT, 1) FROM sys.databases WHERE name = N'{name.Replace("[", "").Replace("]", "")}'");
+                return Data.Execute<bool>(sx);
             }
             catch
             {

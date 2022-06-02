@@ -13,7 +13,7 @@ namespace CORE.MVC
     public class Entity
     {
         [NotMapped]
-        internal DataMapper db_ = null; //DatabaseModel.DataMapper;
+        internal DataMapper db_ = null;
         [NotMapped]
         internal Validation Validation_ = null;
         [Column, NotNull]

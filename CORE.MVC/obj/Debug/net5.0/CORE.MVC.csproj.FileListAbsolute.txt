@@ -10,6 +10,7 @@ C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\CORE.MVC\obj\Debug\net5.0\C
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\CORE.MVC\obj\Debug\net5.0\ref\CORE.MVC.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\CORE.MVC\obj\Debug\net5.0\CORE.MVC.pdb
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\CORE.MVC\obj\Debug\net5.0\CORE.MVC.csproj.AssemblyReference.cache
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\CORE.MVC\bin\Debug\net5.0\core_mvc.json
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\CORE.MVC\bin\Debug\net5.0\CORE.MVC.deps.json
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\CORE.MVC\bin\Debug\net5.0\CORE.MVC.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\CORE.MVC\bin\Debug\net5.0\ref\CORE.MVC.dll
@@ -21,3 +22,4 @@ C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\CORE.MVC\obj\Debug\net5
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\CORE.MVC\obj\Debug\net5.0\CORE.MVC.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\CORE.MVC\obj\Debug\net5.0\ref\CORE.MVC.dll
 C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\CORE.MVC\obj\Debug\net5.0\CORE.MVC.pdb
+C:\Users\euric\OneDrive\Documentos\2022\Projetos\SDK\ORM\CORE.MVC\obj\Debug\net5.0\CORE.MVC.csproj.AssemblyReference.cache

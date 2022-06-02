@@ -1,9 +1,10 @@
-﻿using LinqToDB.Mapping;
+﻿using CORE.MVC;
+using LinqToDB.Mapping;
 using System.Collections.Generic;
 
 namespace TESTE
 {
-    public class Produto : CORE.MVC.Entity
+    public class Produto : Entity
     {
         [PrimaryKey, Identity]
         public long ProductID { get; set; }

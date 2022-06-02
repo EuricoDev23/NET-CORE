@@ -24,6 +24,7 @@
     <None Remove="C:\Users\euric\.nuget\packages\linq2db.sqlserver\3.6.0\contentFiles\any\any\LinqToDB.Templates\PluralizationService.ttinclude" />
     <None Remove="C:\Users\euric\.nuget\packages\linq2db.sqlserver\3.6.0\contentFiles\any\any\LinqToDB.Templates\T4Model.ttinclude" />
     <None Remove="C:\Users\euric\.nuget\packages\linq2db.sqlserver\3.6.0\contentFiles\any\any\LinqToDB.Templates\Validation.ttinclude" />
+    <None Remove="core_mvc.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,12 +33,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CORE.MVC\CORE.MVC.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="core_mvc.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

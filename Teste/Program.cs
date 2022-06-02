@@ -12,7 +12,7 @@ namespace TESTE
 
             var list = Search.Find<Produto>().All();
             
-            Console.ReadKey();
+             Console.ReadKey();
         }
     }
 }
